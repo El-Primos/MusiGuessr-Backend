@@ -1,13 +1,13 @@
-package com.musiguesser.backend;
+package com.musiguessr.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MusiGuesserBackendApplication {
+public class MusiGuessrBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MusiGuesserBackendApplication.class, args);
+		SpringApplication.run(MusiGuessrBackendApplication.class, args);
 	}
 
 }

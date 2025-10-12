@@ -1,6 +1,6 @@
-# MusiGuesser Backend
+# MusiGuessr Backend
 
-Backend API for MusiGuesser - A song guessing game where players guess songs from short previews and compete on leaderboards.
+Backend API for MusiGuessr - A song guessing game where players guess songs from short previews and compete on leaderboards.
 
 ## Tech Stack
 
@@ -21,14 +21,14 @@ Backend API for MusiGuesser - A song guessing game where players guess songs fro
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/El-Primos/MusiGuesser.git
-cd MusiGuesser/MusiGuesser-Backend
+git clone https://github.com/El-Primos/MusiGuessr.git
+cd MusiGuessr/MusiGuessr-Backend
 ```
 
 ### 2. Configure Database
 Edit `src/main/resources/application.properties`:
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/musiguesser
+spring.datasource.url=jdbc:postgresql://localhost:5432/musiguessr
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
@@ -169,7 +169,7 @@ Before creating a PR, make sure:
 ## Project Structure
 
 ```
-src/main/java/com/musiguesser/backend/
+src/main/java/com/musiguessr/backend/
 ├── controller/      # REST API endpoints
 ├── service/         # Business logic
 ├── repository/      # Database access
@@ -215,7 +215,7 @@ server.port=8081
 **Database connection error:**
 - Check PostgreSQL is running
 - Verify credentials in `application.properties`
-- Ensure database `musiguesser` exists
+- Ensure database `musiguessr` exists
 
 **Build errors:**
 - Run `mvn clean install -U` to update dependencies

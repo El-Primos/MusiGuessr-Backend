@@ -8,11 +8,11 @@
 		<version>3.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.musiguesser</groupId>
-	<artifactId>musiguesser-backend</artifactId>
+	<groupId>com.musiguessr</groupId>
+	<artifactId>musiguessr-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>MusiGuesser Backend</name>
-	<description>Backend API for MusiGuesser song guessing game</description>
+	<name>MusiGuessr Backend</name>
+	<description>Backend API for MusiGuessr song guessing game</description>
 	<url/>
 	<licenses>
 		<license/>
