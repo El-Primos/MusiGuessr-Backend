@@ -21,8 +21,8 @@ Backend API for MusiGuessr - A song guessing game where players guess songs from
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/El-Primos/MusiGuessr.git
-cd MusiGuessr/MusiGuessr-Backend
+git clone https://github.com/El-Primos/MusiGuessr-Backend.git
+cd MusiGuessr-Backend
 ```
 
 ### 2. Configure Database
