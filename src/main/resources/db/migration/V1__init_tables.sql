@@ -109,6 +109,16 @@ CREATE TABLE game_history (
   PRIMARY KEY (game_id, user_id)
 );
 
+-- =============== POSTS ===============
+CREATE TABLE posts (
+  id          BIGSERIAL PRIMARY KEY,
+  user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  game_id     BIGINT NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+  content     TEXT,
+  image       TEXT,
+  posted_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Helpful indexes
 CREATE INDEX idx_playlists_user_id          ON playlists(user_id);
 CREATE INDEX idx_playlist_items_music_id    ON playlist_items(music_id);
@@ -120,3 +130,7 @@ CREATE INDEX idx_games_played_at            ON games(played_at);
 CREATE INDEX idx_musics_genre_id            ON musics(genre_id);
 CREATE INDEX idx_musics_album_id            ON musics(album_id);
 CREATE INDEX idx_albums_artist_id           ON albums(artist_id);
+CREATE INDEX idx_posts_user_id              ON posts(user_id);
+CREATE INDEX idx_posts_game_id              ON posts(game_id);
+CREATE INDEX idx_posts_user_id_posted_at    ON posts(user_id, posted_at DESC);
+CREATE INDEX idx_posts_game_id_posted_at    ON posts(game_id, posted_at DESC);
