@@ -9,6 +9,7 @@ Backend API for MusiGuessr - A song guessing game where players guess songs from
 - **PostgreSQL**
 - **AWS S3** (for song storage)
 - **Maven** (build tool)
+- **Flyway** (for database migration)
 
 ---
 
@@ -26,14 +27,58 @@ cd MusiGuessr/MusiGuessr-Backend
 ```
 
 ### 2. Configure Database
-Edit `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/musiguessr
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+```bash
+# Create image with dockerfile
+docker build -t musiguessr-db:latest db
+
+# Create container and run db
+docker run -d --name musiguessr-db -e POSTGRES_USER=app_user -e POSTGRES_PASSWORD=app_pass -e POSTGRES_DB=musiguessr -p 5432:5432 musiguessr-db:latest
+
+# Stop db
+docker stop musiguessr-db
+
+# Start db
+docker start musiguessr-db
 ```
 
-### 3. Compile the Project
+While running app, don't forget to init constants. Those will configure the flyway, check the
+/MusiGuessr-Backend/src/main/resources/application.properties
+```bash
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/musiguessr
+export SPRING_DATASOURCE_USERNAME=app_user
+export SPRING_DATASOURCE_PASSWORD=app_pass
+export SPRING_FLYWAY_USER=app_user
+export SPRING_FLYWAY_PASSWORD=app_pass
+
+./mvnw spring-boot:run
+```
+
+An example query to connect:
+```sql
+SELECT * FROM musiguessr_schema.admins;
+```
+
+### 3. Create Migration SQL Files
+Flyway migration scripts go in `src/main/resources/db/migration`:
+
+```
+V1__create_user_table.sql
+V2__add_email_to_user.sql
+```
+
+Example content:
+
+```sql
+CREATE TABLE users (
+    id PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email VARCHAR(100)
+);
+```
+
+Flyway migrations run automatically when Spring Boot starts
+
+### 4. Compile the Project
 ```bash
 mvn clean install
 ```
@@ -44,7 +89,7 @@ Or using Maven wrapper (no Maven installation needed):
 .\mvnw.cmd clean install    # Windows
 ```
 
-### 4. Run the Application
+### 5. Run the Application
 ```bash
 mvn spring-boot:run
 ```
@@ -57,10 +102,65 @@ Or using Maven wrapper:
 
 The API will start at: `http://localhost:8080`
 
-### 5. Run Tests
+### 6. Run Tests
 ```bash
 mvn test
 ```
+
+---
+
+## Credentials & Environment Variables
+
+⚠️ **Do NOT commit any credentials or sensitive information** (e.g., database passwords, API keys) to this repository. Instead, use environment variables to configure your application securely.
+
+Spring Boot allows you to reference environment variables in your `application.properties` files:
+
+~~~properties
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+
+spring.flyway.user=${SPRING_FLYWAY_USER}
+spring.flyway.password=${SPRING_FLYWAY_PASSWORD}
+~~~
+
+### Environment Variables
+
+Set the following variables in your system before running the application:
+
+| Property | Environment Variable Name | Description |
+|----------|--------------------------|-------------|
+| `spring.datasource.url` | `SPRING_DATASOURCE_URL` | JDBC URL for application database |
+| `spring.datasource.username` | `SPRING_DATASOURCE_USERNAME` | Database username for the application |
+| `spring.datasource.password` | `SPRING_DATASOURCE_PASSWORD` | Database password for the application |
+| `spring.flyway.user` | `SPRING_FLYWAY_USER` | Database username used for Flyway migrations |
+| `spring.flyway.password` | `SPRING_FLYWAY_PASSWORD` | Password for Flyway migrations |
+
+### Setting Environment Variables
+
+**Linux / macOS (bash/zsh):**
+~~~bash
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/musiguessr
+export SPRING_DATASOURCE_USERNAME=your_app_user
+export SPRING_DATASOURCE_PASSWORD=your_app_password
+export SPRING_FLYWAY_USER=flyway_user
+export SPRING_FLYWAY_PASSWORD=flyway_password
+
+./mvnw spring-boot:run
+~~~
+
+**Windows (PowerShell):**
+~~~powershell
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/musiguessr"
+$env:SPRING_DATASOURCE_USERNAME="your_app_user"
+$env:SPRING_DATASOURCE_PASSWORD="your_app_password"
+$env:SPRING_FLYWAY_USER="flyway_user"
+$env:SPRING_FLYWAY_PASSWORD="flyway_password"
+
+.\mvnw spring-boot:run
+~~~
+
+This approach ensures that no credentials are stored in the repository, while Spring Boot can still read them through `application.properties` or other profile-specific property files.
 
 ---
 
@@ -180,7 +280,11 @@ src/main/java/com/musiguessr/backend/
 
 src/main/resources/
 ├── application.properties    # Configuration
-└── application-dev.properties
+├── application-dev.properties
+└── db/
+    └── migration/            # Flyway migration SQL scripts
+        ├── Vx__your_migration_file.sql
+        └── ...               # Additional migration files
 ```
 
 ---
