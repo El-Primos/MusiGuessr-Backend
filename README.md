@@ -27,15 +27,35 @@ cd MusiGuessr/MusiGuessr-Backend
 ```
 
 ### 2. Configure Database
-Edit `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/musiguessr
-spring.datasource.username=your_username
-spring.datasource.password=your_password
+```bash
+# Create image with dockerfile
+docker build -t musiguessr-db:latest db
 
-spring.flyway.user=flyway_username
-spring.flyway.password=flyway_password
-spirng.flyway.default-schema=your_schema
+# Create container and run db
+docker run -d --name musiguessr-db -e POSTGRES_USER=app_user -e POSTGRES_PASSWORD=app_pass -e POSTGRES_DB=musiguessr -p 5432:5432 musiguessr-db:latest
+
+# Stop db
+docker stop musiguessr-db
+
+# Start db
+docker start musiguessr-db
+```
+
+While running app, don't forget to init constants. Those will configure the flyway, check the
+/MusiGuessr-Backend/src/main/resources/application.properties
+```bash
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/musiguessr
+export SPRING_DATASOURCE_USERNAME=app_user
+export SPRING_DATASOURCE_PASSWORD=app_pass
+export SPRING_FLYWAY_USER=app_user
+export SPRING_FLYWAY_PASSWORD=app_pass
+
+./mvnw spring-boot:run
+```
+
+An example query to connect:
+```sql
+SELECT * FROM musiguessr_schema.admins;
 ```
 
 ### 3. Create Migration SQL Files
