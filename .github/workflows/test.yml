@@ -2,18 +2,22 @@ name: Test
 
 on:
   push:
-    branches: [main]
+    branches: [develop]
 
   pull_request:
-    types: [closed]
-    branches: [main]
+    branches: [develop]
 
 jobs:
   test:
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
-
     runs-on: ubuntu-latest
     environment: production
+
+    env:
+      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
+      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+      SPRING_FLYWAY_USER: ${{ secrets.SPRING_FLYWAY_USER }}
+      SPRING_FLYWAY_PASSWORD: ${{ secrets.SPRING_FLYWAY_PASSWORD }}
 
     steps:
       - name: Checkout code
