@@ -53,6 +53,19 @@ export SPRING_FLYWAY_PASSWORD=app_pass
 ./mvnw spring-boot:run
 ```
 
+Recommended option (simpler): use a `.env` file loaded automatically by `spring-dotenv` (no manual exports needed).
+```bash
+# create .env in project root, for example:
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/musiguessr
+SPRING_FLYWAY_USER=app_user
+
+# run the app (env is auto-loaded)
+./mvnw spring-boot:run   # or .\mvnw.cmd spring-boot:run on Windows
+```
+How it maps (examples):
+- `spring.datasource.url=${SPRING_DATASOURCE_URL}` → reads `SPRING_DATASOURCE_URL` from `.env`
+- `spring.flyway.user=${SPRING_FLYWAY_USER}` → reads `SPRING_FLYWAY_USER` from `.env`
+
 An example query to connect:
 ```sql
 SELECT * FROM musiguessr_schema.admins;
