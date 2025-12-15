@@ -1,0 +1,48 @@
+package com.musiguessr.backend.controller;
+
+import com.musiguessr.backend.dto.ArtistRequestDTO;
+import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.service.ArtistService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/artists")
+@RequiredArgsConstructor
+public class ArtistController {
+
+    private final ArtistService artistService;
+
+    @GetMapping
+    public ResponseEntity<List<ArtistResponseDTO>> getAllArtists() {
+        return ResponseEntity.ok(artistService.getAllArtists());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ArtistResponseDTO> getArtistById(@PathVariable Long id) {
+        return ResponseEntity.ok(artistService.getArtistById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<ArtistResponseDTO> createArtist(@Valid @RequestBody ArtistRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(artistService.createArtist(request));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ArtistResponseDTO> updateArtist(
+            @PathVariable Long id,
+            @Valid @RequestBody ArtistRequestDTO request) {
+        return ResponseEntity.ok(artistService.updateArtist(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteArtist(@PathVariable Long id) {
+        artistService.deleteArtist(id);
+        return ResponseEntity.noContent().build();
+    }
+}
