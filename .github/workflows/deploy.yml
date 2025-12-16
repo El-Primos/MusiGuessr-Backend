@@ -9,8 +9,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
 
     steps:
+      - name: Get image tag
+        run: echo "IMAGE_TAG=${{ github.event.workflow_run.outputs.image_tag }}" >> $GITHUB_ENV
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,5 +33,5 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ vars.ECR_REGISTRY }}
-            docker pull ${{ vars.ECR_REGISTRY }}
+            docker pull ${{ vars.ECR_REGISTRY }}:${{ env.IMAGE_TAG }}
             docker-compose -f docker-compose-prod.yml up -d
