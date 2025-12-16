@@ -8,7 +8,17 @@ on:
 
 jobs:
   build:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (
+        (github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.pull_requests[0].base.ref == 'main') ||
+        (github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main')
+      )
+
     runs-on: ubuntu-latest
+
+    outputs:
+      image_tag: ${{ steps.set_tag.outputs.image_tag }}
 
     steps:
       - name: Checkout code
@@ -33,11 +43,15 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Set image tag
+        id: set_tag
+        run: echo "image_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Build Docker image
         run: docker build -t musiguessr-backend .
 
       - name: Tag Docker image for ECR
-        run: docker tag musiguessr-backend:latest ${{ vars.ECR_REGISTRY }}
+        run: docker tag musiguessr-backend ${{ vars.ECR_REGISTRY }}:${{ steps.set_tag.outputs.image_tag }}
 
       - name: Push to ECR
-        run: docker push ${{ vars.ECR_REGISTRY }}
+        run: docker push ${{ vars.ECR_REGISTRY }}:${{ steps.set_tag.outputs.image_tag }}
