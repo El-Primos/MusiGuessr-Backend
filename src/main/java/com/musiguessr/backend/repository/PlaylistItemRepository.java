@@ -1,4 +1,4 @@
-﻿package com.musiguessr.backend.repository;
+package com.musiguessr.backend.repository;
 
 import com.musiguessr.backend.model.PlaylistItem;
 import com.musiguessr.backend.model.PlaylistItemId;

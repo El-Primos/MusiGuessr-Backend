@@ -1,4 +1,4 @@
-﻿package com.musiguessr.backend.model;
+package com.musiguessr.backend.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

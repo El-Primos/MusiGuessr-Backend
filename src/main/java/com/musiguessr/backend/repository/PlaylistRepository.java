@@ -1,4 +1,4 @@
-﻿package com.musiguessr.backend.repository;
+package com.musiguessr.backend.repository;
 
 import com.musiguessr.backend.model.Playlist;
 import org.springframework.data.jpa.repository.JpaRepository;
