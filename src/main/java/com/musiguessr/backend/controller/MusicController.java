@@ -1,0 +1,51 @@
+package com.musiguessr.backend.controller;
+
+import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.service.MusicService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/musics")
+@RequiredArgsConstructor
+public class MusicController {
+
+    private final MusicService musicService;
+
+    @PostMapping("/upload-url")
+    public ResponseEntity<PresignResponseDTO> getUploadUrl(@Valid @RequestBody PresignRequestDTO request) {
+        return ResponseEntity.ok(musicService.presign(request));
+    }
+
+    @PostMapping("/upload-confirm")
+    public ResponseEntity<UploadConfirmResponseDTO> confirmUpload(@Valid @RequestBody UploadConfirmRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(musicService.confirm(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MusicResponseDTO>> getAllMusic() {
+        return ResponseEntity.ok(musicService.getAllMusic());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MusicResponseDTO> getMusicById(@PathVariable Long id) {
+        return ResponseEntity.ok(musicService.getMusicById(id));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<MusicResponseDTO> updateMusic(@PathVariable Long id,
+                                                        @RequestBody MusicUpdateRequestDTO request) {
+        return ResponseEntity.ok(musicService.updateMusic(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMusic(@PathVariable Long id) {
+        musicService.deleteMusic(id);
+        return ResponseEntity.noContent().build();
+    }
+}
