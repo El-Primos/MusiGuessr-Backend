@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.GenreRequestDTO;
-import com.musiguessr.backend.dto.GenreResponseDTO;
+import com.musiguessr.backend.dto.genre.GenreRequestDTO;
+import com.musiguessr.backend.dto.genre.GenreResponseDTO;
 import com.musiguessr.backend.service.GenreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

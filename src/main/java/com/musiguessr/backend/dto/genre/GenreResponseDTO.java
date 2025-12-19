@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.genre;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
