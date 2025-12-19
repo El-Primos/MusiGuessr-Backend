@@ -1,8 +1,8 @@
 package com.musiguessr.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.musiguessr.backend.dto.ArtistRequestDTO;
-import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistRequestDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.service.ArtistService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.artist;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

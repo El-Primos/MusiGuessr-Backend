@@ -1,7 +1,7 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.ArtistRequestDTO;
-import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistRequestDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.repository.ArtistRepository;
 import lombok.RequiredArgsConstructor;
