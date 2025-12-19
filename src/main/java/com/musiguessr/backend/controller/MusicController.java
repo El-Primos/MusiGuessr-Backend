@@ -1,6 +1,6 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.service.MusicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

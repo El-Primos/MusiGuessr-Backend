@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.service.MusicService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ class MusicControllerTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song");
         request.setFileName("song.mp3");
-        request.setContentType("audio/mpeg");
+        request.setContent_type("audio/mpeg");
 
         PresignResponseDTO response = new PresignResponseDTO("OK", "key/123", "http://s3-url");
 
@@ -49,7 +49,7 @@ class MusicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uploadUrl").value("http://s3-url"));
+                .andExpect(jsonPath("$.upload_url").value("http://s3-url"));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.music;
 
 import lombok.Data;
 

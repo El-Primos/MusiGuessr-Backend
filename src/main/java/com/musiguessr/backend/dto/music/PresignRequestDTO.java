@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.music;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -12,5 +12,5 @@ public class PresignRequestDTO {
     private String fileName;
 
     @NotBlank
-    private String contentType;
+    private String content_type;
 }

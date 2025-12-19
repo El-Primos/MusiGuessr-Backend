@@ -1,9 +1,9 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.PresignRequestDTO;
-import com.musiguessr.backend.dto.PresignResponseDTO;
-import com.musiguessr.backend.dto.UploadConfirmRequestDTO;
-import com.musiguessr.backend.dto.UploadConfirmResponseDTO;
+import com.musiguessr.backend.dto.music.PresignRequestDTO;
+import com.musiguessr.backend.dto.music.PresignResponseDTO;
+import com.musiguessr.backend.dto.music.UploadConfirmRequestDTO;
+import com.musiguessr.backend.dto.music.UploadConfirmResponseDTO;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.model.Genre;
 import com.musiguessr.backend.model.Music;
@@ -43,14 +43,14 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContentType("audio/mpeg");
+        request.setContent_type("audio/mpeg");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
         when(s3Service.createPresignedUploadUrl(anyString(), anyString())).thenReturn("http://s3-url.com");
 
         PresignResponseDTO response = musicService.presign(request);
 
-        assertNotNull(response.getUploadUrl());
+        assertNotNull(response.getUpload_url());
         assertTrue(response.getKey().contains("music/"));
         assertTrue(response.getKey().contains("test.mp3"));
     }
@@ -60,7 +60,7 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContentType("audio/wav");
+        request.setContent_type("audio/wav");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
 
@@ -76,7 +76,7 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.exe");
-        request.setContentType("application/octet-stream");
+        request.setContent_type("application/octet-stream");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> musicService.presign(request));

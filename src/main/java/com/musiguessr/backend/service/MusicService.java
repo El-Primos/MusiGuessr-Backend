@@ -1,13 +1,14 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
+import com.musiguessr.backend.dto.genre.GenreResponseDTO;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.model.Genre;
 import com.musiguessr.backend.model.Music;
 import com.musiguessr.backend.repository.ArtistRepository;
 import com.musiguessr.backend.repository.GenreRepository;
 import com.musiguessr.backend.repository.MusicRepository;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -53,15 +54,15 @@ public class MusicService {
         }
 
         String expectedType = VALID_FORMATS.get(normalizedExt);
-        if (!expectedType.equals(request.getContentType())) {
+        if (!expectedType.equals(request.getContent_type())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(
                     "Error: Mismatch! Expected '%s' for .%s extension, but got '%s'",
-                    expectedType, normalizedExt, request.getContentType()
+                    expectedType, normalizedExt, request.getContent_type()
             ));
         }
 
         String uniqueKey = "music/" + UUID.randomUUID() + "_" + request.getFileName();
-        String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, request.getContentType());
+        String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, request.getContent_type());
 
         return new PresignResponseDTO("Presign upload url created", uniqueKey, uploadUrl);
     }
