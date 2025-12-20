@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.ArtistRequestDTO;
-import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistRequestDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.service.ArtistService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,11 @@ public class ArtistController {
     private final ArtistService artistService;
 
     @GetMapping
-    public ResponseEntity<List<ArtistResponseDTO>> getAllArtists() {
-        return ResponseEntity.ok(artistService.getAllArtists());
+    public ResponseEntity<List<ArtistResponseDTO>> getArtists(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset) {
+        return ResponseEntity.ok(artistService.getArtists(name, limit, offset));
     }
 
     @GetMapping("/{id}")

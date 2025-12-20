@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.service.MusicService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ class MusicControllerTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song");
         request.setFileName("song.mp3");
-        request.setContentType("audio/mpeg");
+        request.setContent_type("audio/mpeg");
 
         PresignResponseDTO response = new PresignResponseDTO("OK", "key/123", "http://s3-url");
 
@@ -49,12 +49,11 @@ class MusicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uploadUrl").value("http://s3-url"));
+                .andExpect(jsonPath("$.upload_url").value("http://s3-url"));
     }
 
     @Test
     void confirmUpload_ShouldReturnCreated() throws Exception {
-        // Arrange
         UploadConfirmRequestDTO request = new UploadConfirmRequestDTO();
         request.setKey("key/123");
         request.setName("Song");
@@ -73,10 +72,10 @@ class MusicControllerTest {
     }
 
     @Test
-    void getAllMusic_ShouldReturnList() throws Exception {
+    void getMusics_ShouldReturnList() throws Exception {
         MusicResponseDTO music1 = new MusicResponseDTO(1L, "Song1", "url1", null, null);
         MusicResponseDTO music2 = new MusicResponseDTO(1L, "Song2", "url2", null, null);
-        when(musicService.getAllMusic()).thenReturn(List.of(music1, music2));
+        when(musicService.getMusics(null, null, null, null, null)).thenReturn(List.of(music1, music2));
 
         mockMvc.perform(get("/api/musics"))
                 .andExpect(status().isOk())
@@ -86,12 +85,12 @@ class MusicControllerTest {
 
     @Test
     void updateMusic_ShouldReturnOk() throws Exception {
-        MusicUpdateRequestDTO request = new MusicUpdateRequestDTO();
+        MusicRequestDTO request = new MusicRequestDTO();
         request.setName("New Name");
 
         MusicResponseDTO response = new MusicResponseDTO(1L, "New Name", "url", null, null);
 
-        when(musicService.updateMusic(eq(1L), any(MusicUpdateRequestDTO.class))).thenReturn(response);
+        when(musicService.updateMusic(eq(1L), any(MusicRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(patch("/api/musics/1")
                         .contentType(MediaType.APPLICATION_JSON)
