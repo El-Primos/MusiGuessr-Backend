@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

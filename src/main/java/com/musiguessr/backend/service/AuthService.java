@@ -1,8 +1,8 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.AuthResponseDTO;
-import com.musiguessr.backend.dto.LoginRequestDTO;
-import com.musiguessr.backend.dto.RegisterRequestDTO;
+import com.musiguessr.backend.dto.auth.AuthResponseDTO;
+import com.musiguessr.backend.dto.auth.LoginRequestDTO;
+import com.musiguessr.backend.dto.auth.RegisterRequestDTO;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
