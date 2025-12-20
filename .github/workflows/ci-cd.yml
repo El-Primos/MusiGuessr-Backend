@@ -17,6 +17,7 @@ jobs:
       SPRING_FLYWAY_PASSWORD: ${{ secrets.SPRING_FLYWAY_PASSWORD }}
       AWS_ACCESS_KEY_ID: ${{ secrets.S3_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_AWS_SECRET_ACCESS_KEY }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
 
     steps:
       - name: Checkout code
