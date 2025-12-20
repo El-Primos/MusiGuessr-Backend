@@ -35,7 +35,7 @@ public class GameSessionStore {
         private Long playlistId;
 
         private OffsetDateTime startedAt;
-        private int round; // 0 before first /next
+        private int round;
         private int totalScore;
 
         private java.util.List<Long> orderedSongIds;
