@@ -16,11 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -92,8 +90,17 @@ public class MusicService {
     }
 
     @Transactional(readOnly = true)
-    public List<MusicResponseDTO> getAllMusic() {
-        return musicRepository.findAll().stream()
+    public List<MusicResponseDTO> getMusics(String name, Long artistId, Long genreId, Integer limit, Integer offset) {
+        Stream<Music> stream = musicRepository.findAll().stream();
+
+        if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
+        if (artistId != null) stream = stream.filter(p -> Objects.equals(p.getArtist().getId(), artistId));
+        if (genreId != null) stream = stream.filter(p -> Objects.equals(p.getGenre().getId(), genreId));
+
+        int safeOffset = (offset == null || offset < 0) ? 0 : offset;
+        int safeLimit = (limit == null || limit < 0) ? 50 : limit;
+
+        return stream.skip(safeOffset).limit(safeLimit)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
