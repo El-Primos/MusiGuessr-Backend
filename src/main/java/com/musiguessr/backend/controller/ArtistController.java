@@ -19,8 +19,11 @@ public class ArtistController {
     private final ArtistService artistService;
 
     @GetMapping
-    public ResponseEntity<List<ArtistResponseDTO>> getAllArtists() {
-        return ResponseEntity.ok(artistService.getAllArtists());
+    public ResponseEntity<List<ArtistResponseDTO>> getArtists(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset) {
+        return ResponseEntity.ok(artistService.getArtists(name, limit, offset));
     }
 
     @GetMapping("/{id}")

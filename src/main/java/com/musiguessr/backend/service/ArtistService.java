@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +21,15 @@ public class ArtistService {
     private final ArtistRepository artistRepository;
 
     @Transactional(readOnly = true)
-    public List<ArtistResponseDTO> getAllArtists() {
-        return artistRepository.findAll().stream()
+    public List<ArtistResponseDTO> getArtists(String name, Integer limit, Integer offset) {
+        Stream<Artist> stream = artistRepository.findAll().stream();
+
+        if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
+
+        int safeOffset = (offset == null || offset < 0) ? 0 : offset;
+        int safeLimit = (limit == null || limit < 0) ? 50 : limit;
+
+        return stream.skip(safeOffset).limit(safeLimit)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
