@@ -86,12 +86,12 @@ class MusicControllerTest {
 
     @Test
     void updateMusic_ShouldReturnOk() throws Exception {
-        MusicUpdateRequestDTO request = new MusicUpdateRequestDTO();
+        MusicRequestDTO request = new MusicRequestDTO();
         request.setName("New Name");
 
         MusicResponseDTO response = new MusicResponseDTO(1L, "New Name", "url", null, null);
 
-        when(musicService.updateMusic(eq(1L), any(MusicUpdateRequestDTO.class))).thenReturn(response);
+        when(musicService.updateMusic(eq(1L), any(MusicRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(patch("/api/musics/1")
                         .contentType(MediaType.APPLICATION_JSON)

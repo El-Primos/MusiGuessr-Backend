@@ -107,7 +107,7 @@ public class MusicService {
     }
 
     @Transactional
-    public MusicResponseDTO updateMusic(Long id, MusicUpdateRequestDTO request) {
+    public MusicResponseDTO updateMusic(Long id, MusicRequestDTO request) {
         Music music = musicRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Music not found"));
 

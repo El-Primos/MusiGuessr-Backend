@@ -39,7 +39,7 @@ public class MusicController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<MusicResponseDTO> updateMusic(@PathVariable Long id,
-                                                        @RequestBody MusicUpdateRequestDTO request) {
+                                                        @RequestBody MusicRequestDTO request) {
         return ResponseEntity.ok(musicService.updateMusic(id, request));
     }
 
