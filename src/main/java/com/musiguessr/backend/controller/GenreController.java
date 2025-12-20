@@ -27,7 +27,7 @@ public class GenreController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GenreResponseDTO> getArtistById(@PathVariable Long id) {
+    public ResponseEntity<GenreResponseDTO> getGenreById(@PathVariable Long id) {
         return ResponseEntity.ok(genreService.getGenreById(id));
     }
 
