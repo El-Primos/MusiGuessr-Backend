@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class LoginRequestDTO {
     @NotBlank
-    private String userName;
+    private String username;
 
     @NotBlank
     private String password;

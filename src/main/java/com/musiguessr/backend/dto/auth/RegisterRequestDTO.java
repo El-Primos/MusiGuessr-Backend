@@ -1,4 +1,4 @@
-package com.musiguessr.backend.dto;
+package com.musiguessr.backend.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,7 @@ public class RegisterRequestDTO {
     private String name;
 
     @NotBlank
-    private String userName;
+    private String username;
 
     @NotBlank
     @Email
