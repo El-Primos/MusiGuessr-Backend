@@ -1,6 +1,8 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.GenreResponseDTO;
+import com.musiguessr.backend.dto.MusicResponseDTO;
 import com.musiguessr.backend.dto.playlist.*;
 import com.musiguessr.backend.model.Music;
 import com.musiguessr.backend.model.Playlist;
@@ -30,7 +32,6 @@ public class PlaylistService {
 
     @Transactional(readOnly = true)
     public List<PlaylistResponseDTO> getPlaylists(Long ownerId, Boolean isCurated, String q, Integer limit, Integer offset) {
-        // isCurated ignored (DB has no column)
         Stream<Playlist> stream = playlistRepository.findAll().stream();
 
         if (ownerId != null) stream = stream.filter(p -> Objects.equals(p.getUserId(), ownerId));
@@ -64,7 +65,6 @@ public class PlaylistService {
             Playlist saved = playlistRepository.save(playlist);
             return mapToDTO("Playlist created", saved);
         } catch (Exception e) {
-            // likely uq_playlists_owner_name violation
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Playlist name already exists for this user");
         }
     }
@@ -121,7 +121,6 @@ public class PlaylistService {
             if (request.getPosition() < 1) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
             }
-            // If position already used (PK conflict), reject (no shifting)
             boolean positionTaken = playlistItemRepository.existsById(new PlaylistItemId(playlistId, request.getPosition()));
             if (positionTaken) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Position already taken");
@@ -164,7 +163,6 @@ public class PlaylistService {
                 .map(PlaylistItem::getMusic)
                 .collect(Collectors.toMap(Music::getId, m -> m));
 
-        // validate: all songs exist in playlist
         for (PlaylistReorderItemDTO it : request.getItems()) {
             if (it.getPosition() == null || it.getPosition() < 1) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
@@ -174,7 +172,6 @@ public class PlaylistService {
             }
         }
 
-        // delete and recreate (because position is part of PK)
         playlistItemRepository.deleteAll(current);
 
         List<PlaylistItem> recreated = new ArrayList<>();
@@ -214,7 +211,6 @@ public class PlaylistService {
         );
     }
 
-    // reuse your existing mapping (same as earlier)
     private MusicResponseDTO mapMusicToDTO(Music music) {
         GenreResponseDTO genreDTO = (music.getGenre() != null)
                 ? new GenreResponseDTO(music.getGenre().getId(), music.getGenre().getName())
