@@ -1,6 +1,6 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.MusicResponseDTO;
+import com.musiguessr.backend.dto.music.MusicResponseDTO;
 import com.musiguessr.backend.dto.playlist.*;
 import com.musiguessr.backend.service.PlaylistService;
 import jakarta.validation.Valid;

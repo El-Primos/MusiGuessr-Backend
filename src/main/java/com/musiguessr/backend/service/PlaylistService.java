@@ -1,8 +1,8 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.ArtistResponseDTO;
-import com.musiguessr.backend.dto.GenreResponseDTO;
-import com.musiguessr.backend.dto.MusicResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
+import com.musiguessr.backend.dto.genre.GenreResponseDTO;
+import com.musiguessr.backend.dto.music.MusicResponseDTO;
 import com.musiguessr.backend.dto.playlist.*;
 import com.musiguessr.backend.model.Music;
 import com.musiguessr.backend.model.Playlist;
