@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +19,13 @@ public class MusicController {
     private final MusicService musicService;
 
     @PostMapping("/upload-url")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PresignResponseDTO> getUploadUrl(@Valid @RequestBody PresignRequestDTO request) {
         return ResponseEntity.ok(musicService.presign(request));
     }
 
     @PostMapping("/upload-confirm")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UploadConfirmResponseDTO> confirmUpload(@Valid @RequestBody UploadConfirmRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(musicService.confirm(request));
     }
@@ -43,12 +46,14 @@ public class MusicController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MusicResponseDTO> updateMusic(@PathVariable Long id,
                                                         @RequestBody MusicRequestDTO request) {
         return ResponseEntity.ok(musicService.updateMusic(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteMusic(@PathVariable Long id) {
         musicService.deleteMusic(id);
         return ResponseEntity.noContent().build();

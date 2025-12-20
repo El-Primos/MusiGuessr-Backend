@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,17 +36,20 @@ public class PlaylistController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlaylistResponseDTO> createPlaylist(@Valid @RequestBody PlaylistRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(playlistService.createPlaylist(request));
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Long id,
                                                               @RequestBody PlaylistUpdateRequestDTO request) {
         return ResponseEntity.ok(playlistService.updatePlaylist(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePlaylist(@PathVariable Long id) {
         playlistService.deletePlaylist(id);
         return ResponseEntity.noContent().build();
@@ -57,6 +61,7 @@ public class PlaylistController {
     }
 
     @PostMapping("/{id}/songs")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> addSongToPlaylist(@PathVariable Long id,
                                                   @Valid @RequestBody PlaylistAddSongRequestDTO request) {
         playlistService.addSongToPlaylist(id, request);
@@ -64,6 +69,7 @@ public class PlaylistController {
     }
 
     @DeleteMapping("/{id}/songs/{song_id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> removeSongFromPlaylist(@PathVariable Long id,
                                                        @PathVariable("song_id") Long songId) {
         playlistService.removeSongFromPlaylist(id, songId);
@@ -71,6 +77,7 @@ public class PlaylistController {
     }
 
     @PostMapping("/{id}/reorder")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> reorder(@PathVariable Long id,
                                         @Valid @RequestBody PlaylistReorderRequestDTO request) {
         playlistService.reorder(id, request);
