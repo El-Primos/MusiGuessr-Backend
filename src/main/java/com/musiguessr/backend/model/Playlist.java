@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "playlists")
+@Table(name = "playlists", schema = "musiguessr_schema")
 public class Playlist {
 
     @Id
@@ -20,11 +20,8 @@ public class Playlist {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "owner_id")
-    private Long ownerId;
-
-    @Column(name = "is_curated", nullable = false)
-    private Boolean isCurated = false;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;

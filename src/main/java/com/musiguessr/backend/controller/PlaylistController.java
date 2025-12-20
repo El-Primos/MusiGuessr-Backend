@@ -1,6 +1,6 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.MusicResponseDTO;
+import com.musiguessr.backend.dto.*;
 import com.musiguessr.backend.dto.playlist.*;
 import com.musiguessr.backend.service.PlaylistService;
 import jakarta.validation.Valid;
@@ -40,10 +40,8 @@ public class PlaylistController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PlaylistResponseDTO> updatePlaylist(
-            @PathVariable Long id,
-            @RequestBody PlaylistUpdateRequestDTO request
-    ) {
+    public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Long id,
+                                                              @RequestBody PlaylistUpdateRequestDTO request) {
         return ResponseEntity.ok(playlistService.updatePlaylist(id, request));
     }
 
@@ -59,28 +57,22 @@ public class PlaylistController {
     }
 
     @PostMapping("/{id}/songs")
-    public ResponseEntity<Void> addSongToPlaylist(
-            @PathVariable Long id,
-            @Valid @RequestBody PlaylistAddSongRequestDTO request
-    ) {
+    public ResponseEntity<Void> addSongToPlaylist(@PathVariable Long id,
+                                                  @Valid @RequestBody PlaylistAddSongRequestDTO request) {
         playlistService.addSongToPlaylist(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{id}/songs/{song_id}")
-    public ResponseEntity<Void> removeSongFromPlaylist(
-            @PathVariable Long id,
-            @PathVariable("song_id") Long songId
-    ) {
+    public ResponseEntity<Void> removeSongFromPlaylist(@PathVariable Long id,
+                                                       @PathVariable("song_id") Long songId) {
         playlistService.removeSongFromPlaylist(id, songId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/reorder")
-    public ResponseEntity<Void> reorder(
-            @PathVariable Long id,
-            @Valid @RequestBody PlaylistReorderRequestDTO request
-    ) {
+    public ResponseEntity<Void> reorder(@PathVariable Long id,
+                                        @Valid @RequestBody PlaylistReorderRequestDTO request) {
         playlistService.reorder(id, request);
         return ResponseEntity.ok().build();
     }

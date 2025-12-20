@@ -13,15 +13,13 @@ public class PlaylistResponseDTO {
     private Long id;
     private String name;
     private Long owner_id;
-    private Boolean is_curated;
     private OffsetDateTime created_at;
 
-    public PlaylistResponseDTO(Long id, String name, Long owner_id, Boolean is_curated, OffsetDateTime created_at) {
+    public PlaylistResponseDTO(Long id, String name, Long owner_id, OffsetDateTime created_at) {
         this.message = null;
         this.id = id;
         this.name = name;
         this.owner_id = owner_id;
-        this.is_curated = is_curated;
         this.created_at = created_at;
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "playlist_items")
+@Table(name = "playlist_items", schema = "musiguessr_schema")
 public class PlaylistItem {
 
     @EmbeddedId
@@ -19,19 +19,15 @@ public class PlaylistItem {
     @MapsId("playlistId")
     @JoinColumn(
             name = "playlist_id",
-            foreignKey = @ForeignKey(name = "fk_playlist_item_playlist")
+            foreignKey = @ForeignKey(name = "playlist_items_playlist_id_fkey")
     )
     private Playlist playlist;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("songId")
     @JoinColumn(
-            name = "song_id",
-            foreignKey = @ForeignKey(name = "fk_playlist_item_music")
+            name = "music_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "playlist_items_music_id_fkey")
     )
-    private Music song;
-
-    // Needed for POST /playlists/:id/songs position? and reorder endpoint
-    @Column
-    private Integer position;
+    private Music music;
 }

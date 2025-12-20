@@ -8,11 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlaylistItemRepository extends JpaRepository<PlaylistItem, PlaylistItemId> {
 
-    boolean existsByIdPlaylistIdAndIdSongId(Long playlistId, Long songId);
+    List<PlaylistItem> findByIdPlaylistIdOrderByIdPositionAsc(Long playlistId);
 
-    List<PlaylistItem> findByIdPlaylistIdOrderByPositionAsc(Long playlistId);
+    boolean existsByIdPlaylistIdAndMusicId(Long playlistId, Long musicId);
 
-    Optional<PlaylistItem> findByIdPlaylistIdAndIdSongId(Long playlistId, Long songId);
+    Optional<PlaylistItem> findByIdPlaylistIdAndMusicId(Long playlistId, Long musicId);
 
-    void deleteByIdPlaylistIdAndIdSongId(Long playlistId, Long songId);
+    void deleteByIdPlaylistIdAndMusicId(Long playlistId, Long musicId);
 }
