@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.GenreRequestDTO;
-import com.musiguessr.backend.dto.GenreResponseDTO;
+import com.musiguessr.backend.dto.genre.GenreRequestDTO;
+import com.musiguessr.backend.dto.genre.GenreResponseDTO;
 import com.musiguessr.backend.service.GenreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +19,11 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping
-    public ResponseEntity<List<GenreResponseDTO>> getAllGenres() {
-        return ResponseEntity.ok(genreService.getAllGenres());
+    public ResponseEntity<List<GenreResponseDTO>> getGenres(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset) {
+        return ResponseEntity.ok(genreService.getGenres(name, limit, offset));
     }
 
     @GetMapping("/{id}")

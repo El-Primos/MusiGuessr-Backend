@@ -1,6 +1,6 @@
 package com.musiguessr.backend.controller;
 
-import com.musiguessr.backend.dto.*;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.service.MusicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,13 @@ public class MusicController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MusicResponseDTO>> getAllMusic() {
-        return ResponseEntity.ok(musicService.getAllMusic());
+    public ResponseEntity<List<MusicResponseDTO>> getMusics(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "artist_id", required = false) Long artistId,
+            @RequestParam(value = "genre_id", required = false) Long genreId,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "offset", required = false) Integer offset) {
+        return ResponseEntity.ok(musicService.getMusics(name, artistId, genreId, limit, offset));
     }
 
     @GetMapping("/{id}")
@@ -39,7 +44,7 @@ public class MusicController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<MusicResponseDTO> updateMusic(@PathVariable Long id,
-                                                        @RequestBody MusicUpdateRequestDTO request) {
+                                                        @RequestBody MusicRequestDTO request) {
         return ResponseEntity.ok(musicService.updateMusic(id, request));
     }
 

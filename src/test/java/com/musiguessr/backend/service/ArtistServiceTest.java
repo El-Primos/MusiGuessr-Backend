@@ -1,7 +1,7 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.ArtistRequestDTO;
-import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistRequestDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.repository.ArtistRepository;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -28,17 +29,17 @@ class ArtistServiceTest {
     private ArtistService artistService;
 
     @Test
-    void getAllArtists_ShouldReturnList() {
+    void getArtists_shouldReturnFilteredArtists() {
         Artist artist = new Artist();
         artist.setId(1L);
-        artist.setName("Pink Floyd");
+        artist.setName("Daft Punk");
         when(artistRepository.findAll()).thenReturn(List.of(artist));
 
-        List<ArtistResponseDTO> result = artistService.getAllArtists();
+        List<ArtistResponseDTO> result =
+                artistService.getArtists("daft", 10, 0);
 
-        assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals("Pink Floyd", result.get(0).getName());
+        assertEquals("Daft Punk", result.getFirst().getName());
     }
 
     @Test

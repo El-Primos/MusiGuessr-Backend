@@ -1,9 +1,6 @@
 package com.musiguessr.backend.service;
 
-import com.musiguessr.backend.dto.PresignRequestDTO;
-import com.musiguessr.backend.dto.PresignResponseDTO;
-import com.musiguessr.backend.dto.UploadConfirmRequestDTO;
-import com.musiguessr.backend.dto.UploadConfirmResponseDTO;
+import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.model.Genre;
 import com.musiguessr.backend.model.Music;
@@ -17,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,14 +41,14 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContentType("audio/mpeg");
+        request.setContent_type("audio/mpeg");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
         when(s3Service.createPresignedUploadUrl(anyString(), anyString())).thenReturn("http://s3-url.com");
 
         PresignResponseDTO response = musicService.presign(request);
 
-        assertNotNull(response.getUploadUrl());
+        assertNotNull(response.getUpload_url());
         assertTrue(response.getKey().contains("music/"));
         assertTrue(response.getKey().contains("test.mp3"));
     }
@@ -60,7 +58,7 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContentType("audio/wav");
+        request.setContent_type("audio/wav");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
 
@@ -68,6 +66,7 @@ class MusicServiceTest {
                 () -> musicService.presign(request));
 
         assertEquals("400 BAD_REQUEST", exception.getStatusCode().toString());
+        assertNotNull(exception.getReason());
         assertTrue(exception.getReason().contains("Mismatch! Expected 'audio/mpeg'"));
     }
 
@@ -76,11 +75,12 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.exe");
-        request.setContentType("application/octet-stream");
+        request.setContent_type("application/octet-stream");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> musicService.presign(request));
 
+        assertNotNull(exception.getReason());
         assertTrue(exception.getReason().contains("is not supported"));
     }
 
@@ -108,6 +108,71 @@ class MusicServiceTest {
         assertEquals(10L, response.getId());
         assertEquals("http://full-url.com", response.getUrl());
         verify(musicRepository).save(any(Music.class));
+    }
+
+    @Test
+    void getMusics_shouldReturnFilteredArtists() {
+        Music music = new Music();
+        music.setId(1L);
+        music.setName("Bohemian Rhapsody");
+        when(musicRepository.findAll()).thenReturn(List.of(music));
+
+        List<MusicResponseDTO> result =
+                musicService.getMusics("bohem", null, null, 10, 0);
+
+        assertEquals(1, result.size());
+        assertEquals("Bohemian Rhapsody", result.getFirst().getName());
+    }
+
+    @Test
+    void getMusicById_WhenExists_ShouldReturnGenre() {
+        Music music = new Music();
+        music.setId(1L);
+        music.setName("Bohemian Rhapsody");
+
+        when(musicRepository.findById(1L)).thenReturn(Optional.of(music));
+
+        MusicResponseDTO result = musicService.getMusicById(1L);
+
+        assertNotNull(result);
+        assertEquals("Bohemian Rhapsody", result.getName());
+    }
+
+    @Test
+    void updateMusic_WhenValid_ShouldUpdate() {
+        Music existingMusic = new Music();
+        existingMusic.setId(1L);
+        existingMusic.setName("Old Name");
+
+        MusicRequestDTO request = new MusicRequestDTO();
+        request.setName("New Name");
+
+        when(musicRepository.findById(1L)).thenReturn(Optional.of(existingMusic));
+        when(musicRepository.existsByName("New Name")).thenReturn(false);
+        when(musicRepository.save(any(Music.class))).thenAnswer(i -> i.getArgument(0));
+
+        MusicResponseDTO result = musicService.updateMusic(1L, request);
+
+        assertEquals("New Name", result.getName());
+    }
+
+    @Test
+    void updateMusic_WhenNameConflict_ShouldThrowException() {
+        Music existingMusic = new Music();
+        existingMusic.setId(1L);
+        existingMusic.setName("Bohemian Rhapsody");
+
+        MusicRequestDTO request = new MusicRequestDTO();
+        request.setName("Stairway to Heaven");
+
+        when(musicRepository.findById(1L)).thenReturn(Optional.of(existingMusic));
+        when(musicRepository.existsByName("Stairway to Heaven")).thenReturn(true);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> musicService.updateMusic(1L, request));
+
+        assertNotNull(exception.getReason());
+        assertTrue(exception.getReason().contains("Music name already exists"));
     }
 
     @Test

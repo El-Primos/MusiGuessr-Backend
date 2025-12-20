@@ -1,8 +1,8 @@
 package com.musiguessr.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.musiguessr.backend.dto.ArtistRequestDTO;
-import com.musiguessr.backend.dto.ArtistResponseDTO;
+import com.musiguessr.backend.dto.artist.ArtistRequestDTO;
+import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.service.ArtistService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +36,10 @@ class ArtistControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void getAllArtists_ShouldReturnList() throws Exception {
+    void getArtists_ShouldReturnList() throws Exception {
         ArtistResponseDTO artist1 = new ArtistResponseDTO(1L, "Pink Floyd");
         ArtistResponseDTO artist2 = new ArtistResponseDTO(2L, "The Beatles");
-        when(artistService.getAllArtists()).thenReturn(List.of(artist1, artist2));
+        when(artistService.getArtists(null, null, null)).thenReturn(List.of(artist1, artist2));
 
         mockMvc.perform(get("/api/artists"))
                 .andExpect(status().isOk())
