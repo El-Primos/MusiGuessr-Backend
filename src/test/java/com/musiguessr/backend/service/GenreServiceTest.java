@@ -28,19 +28,17 @@ class GenreServiceTest {
     private GenreService genreService;
 
     @Test
-    void getAllGenres_ShouldReturnList() {
-        // Arrange
+    void getGenres_shouldReturnFilteredArtists() {
         Genre genre = new Genre();
         genre.setId(1L);
         genre.setName("Rock");
-
         when(genreRepository.findAll()).thenReturn(List.of(genre));
 
-        List<GenreResponseDTO> result = genreService.getAllGenres();
+        List<GenreResponseDTO> result =
+                genreService.getGenres("rock", 10, 0);
 
-        assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals("Rock", result.get(0).getName());
+        assertEquals("Rock", result.getFirst().getName());
     }
 
     @Test
@@ -131,6 +129,7 @@ class GenreServiceTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> genreService.updateGenre(1L, request));
 
+        assertNotNull(exception.getReason());
         assertTrue(exception.getReason().contains("Genre name already exists"));
     }
 

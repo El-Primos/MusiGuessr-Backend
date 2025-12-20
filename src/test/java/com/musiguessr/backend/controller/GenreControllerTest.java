@@ -36,10 +36,10 @@ class GenreControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void getAllGenres_ShouldReturnList() throws Exception {
+    void getGenres_ShouldReturnList() throws Exception {
         GenreResponseDTO genre1 = new GenreResponseDTO(1L, "Rock");
         GenreResponseDTO genre2 = new GenreResponseDTO(1L, "Pop");
-        when(genreService.getAllGenres()).thenReturn(List.of(genre1, genre2));
+        when(genreService.getGenres(null, null, null)).thenReturn(List.of(genre1, genre2));
 
         mockMvc.perform(get("/api/genres"))
                 .andExpect(status().isOk())

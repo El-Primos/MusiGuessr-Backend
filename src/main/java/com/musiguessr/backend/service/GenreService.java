@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,15 @@ public class GenreService {
     private final GenreRepository genreRepository;
 
     @Transactional(readOnly = true)
-    public List<GenreResponseDTO> getAllGenres() {
-        return genreRepository.findAll().stream()
+    public List<GenreResponseDTO> getGenres(String name, Integer limit, Integer offset) {
+        Stream<Genre> stream = genreRepository.findAll().stream();
+
+        if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
+
+        int safeOffset = (offset == null || offset < 0) ? 0 : offset;
+        int safeLimit = (limit == null || limit < 0) ? 50 : limit;
+
+        return stream.skip(safeOffset).limit(safeLimit)
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
