@@ -14,16 +14,26 @@ public class AuthResponseDTO {
     private String username;
     private String email;
     private String role;
-    private String token;
-    private String token_type;
+    private String accessToken;
+    private String refreshToken;
+    private String tokenType;
 
-    public AuthResponseDTO(String message, Long id, String username, String email, Role role, String token) {
+    public AuthResponseDTO(
+            String message,
+            Long id,
+            String username,
+            String email,
+            Role role,
+            String accessToken,
+            String refreshToken
+    ) {
         this.message = message;
         this.id = id;
         this.username = username;
         this.email = email;
         this.role = role.name();
-        this.token = token;
-        this.token_type = "Bearer";
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tokenType = "Bearer";
     }
 }
