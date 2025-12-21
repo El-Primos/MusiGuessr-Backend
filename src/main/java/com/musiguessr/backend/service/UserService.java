@@ -2,6 +2,8 @@ package com.musiguessr.backend.service;
 
 import com.musiguessr.backend.dto.UserResponseDTO;
 import com.musiguessr.backend.dto.MeProfileDTO;
+import com.musiguessr.backend.dto.GameHistoryDTO;
+import com.musiguessr.backend.dto.TournamentHistoryDTO;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
@@ -52,6 +54,29 @@ public class UserService {
                 projection.getTotalScore(),
                 projection.getGamesPlayed(),
                 projection.getLastPlayedAt());
+    }
+
+    @Transactional(readOnly = true)
+    public List<GameHistoryDTO> getGameHistory(Long userId) {
+        return userRepository.findGameHistoryByUserId(userId).stream()
+                .map(p -> new GameHistoryDTO(
+                        p.getGameId(),
+                        p.getPlaylistId(),
+                        p.getTotalScore(),
+                        p.getPlayedAt()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TournamentHistoryDTO> getTournamentHistory(Long userId) {
+        return userRepository.findTournamentHistoryByUserId(userId).stream()
+                .map(p -> new TournamentHistoryDTO(
+                        p.getTournamentId(),
+                        p.getUserScore(),
+                        p.getStatus(),
+                        p.getStartsAt(),
+                        p.getEndsAt()))
+                .toList();
     }
 
     private UserResponseDTO toDto(User user) {

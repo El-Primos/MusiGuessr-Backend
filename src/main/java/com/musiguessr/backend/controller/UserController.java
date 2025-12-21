@@ -2,6 +2,8 @@ package com.musiguessr.backend.controller;
 
 import com.musiguessr.backend.dto.UserResponseDTO;
 import com.musiguessr.backend.dto.MeProfileDTO;
+import com.musiguessr.backend.dto.GameHistoryDTO;
+import com.musiguessr.backend.dto.TournamentHistoryDTO;
 import com.musiguessr.backend.service.UserService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -33,13 +36,23 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "User with id " + id + " deleted successfully"));
     }
 
     @GetMapping("/me/profile")
     public ResponseEntity<MeProfileDTO> getProfile(@RequestParam("userId") Long userId) {
         return ResponseEntity.ok(userService.getProfile(userId));
+    }
+
+    @GetMapping("/me/history/games")
+    public ResponseEntity<List<GameHistoryDTO>> getGameHistory(@RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(userService.getGameHistory(userId));
+    }
+
+    @GetMapping("/me/history/tournaments")
+    public ResponseEntity<List<TournamentHistoryDTO>> getTournamentHistory(@RequestParam("userId") Long userId) {
+        return ResponseEntity.ok(userService.getTournamentHistory(userId));
     }
 }
