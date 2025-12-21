@@ -2,6 +2,7 @@ package com.musiguessr.backend.service;
 
 import com.musiguessr.backend.dto.auth.AuthResponseDTO;
 import com.musiguessr.backend.dto.auth.LoginRequestDTO;
+import com.musiguessr.backend.dto.auth.LogoutRequestDTO;
 import com.musiguessr.backend.dto.auth.RegisterRequestDTO;
 import com.musiguessr.backend.model.RefreshToken;
 import com.musiguessr.backend.model.Role;
@@ -93,5 +94,8 @@ public class AuthService {
         );
     }
 
+    @Transactional
+    public void logout(LogoutRequestDTO request) {
+            refreshTokenRepository.deleteByToken(request.getRefreshToken());
     }
 }
