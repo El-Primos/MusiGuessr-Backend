@@ -13,10 +13,11 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final long EXPIRATION = 1000 * 60 * 60;
-
     @Value("${jwt.secret}")
     private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long expiration;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(
@@ -24,11 +25,11 @@ public class JwtUtil {
         );
     }
 
-    public String generateToken(String username) {
+    public String generateJwtToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
