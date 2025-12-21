@@ -44,7 +44,7 @@ public class AuthService {
         user.setRole(Role.USER);
 
         User saved = userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateJwtToken(user.getUsername());
 
         return new AuthResponseDTO("User registered", saved.getId(), saved.getUsername(), saved.getEmail(),
                 saved.getRole(), token);
@@ -67,7 +67,7 @@ public class AuthService {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         User user = userDetails.getUser();
 
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateJwtToken(user.getUsername());
 
         return new AuthResponseDTO("User logged in", user.getId(), user.getUsername(), user.getEmail(),
                 user.getRole(), token);
