@@ -12,7 +12,7 @@ public class RegisterRequestDTO {
     private String name;
 
     @NotBlank
-    private String userName;
+    private String username;
 
     @NotBlank
     @Email

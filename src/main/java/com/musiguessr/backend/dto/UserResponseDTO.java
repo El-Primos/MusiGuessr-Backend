@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class UserResponseDTO {
     private Long id;
     private String name;
-    private String userName;
+    private String username;
     private String email;
     private Integer totalScore;
     private OffsetDateTime createdAt;

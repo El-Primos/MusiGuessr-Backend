@@ -8,14 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean existsByUserName(String userName);
+    boolean existsByUsername(String username);
     boolean existsByEmail(String email);
-    Optional<User> findByUserName(String userName);
+    Optional<User> findByUsername(String username);
 
     interface ProfileProjection {
         Long getId();
         String getName();
-        String getUserName();
+        String getUsername();
         String getEmail();
         Integer getTotalScore();
         Long getGamesPlayed();
@@ -41,7 +41,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             SELECT
                 u.id,
                 u.name,
-                u.user_name AS userName,
+                u.username AS username,
                 u.email,
                 u.score AS totalScore,
                 COALESCE((SELECT COUNT(*) FROM musiguessr_schema.game_history gh WHERE gh.user_id = u.id), 0) AS gamesPlayed,

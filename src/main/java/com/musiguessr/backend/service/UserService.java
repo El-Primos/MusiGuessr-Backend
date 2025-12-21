@@ -49,7 +49,7 @@ public class UserService {
         return new MeProfileDTO(
                 projection.getId(),
                 projection.getName(),
-                projection.getUserName(),
+                projection.getUsername(),
                 projection.getEmail(),
                 projection.getTotalScore(),
                 projection.getGamesPlayed(),
@@ -83,7 +83,7 @@ public class UserService {
         return new UserResponseDTO(
                 user.getId(),
                 user.getName(),
-                user.getUserName(),
+                user.getUsername(),
                 user.getEmail(),
                 user.getScore(),
                 user.getCreatedAt());

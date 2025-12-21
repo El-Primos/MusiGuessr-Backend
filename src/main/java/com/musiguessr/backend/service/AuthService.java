@@ -21,7 +21,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDTO register(RegisterRequestDTO request) {
-        if (userRepository.existsByUserName(request.getUserName())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -30,24 +30,24 @@ public class AuthService {
 
         User user = new User();
         user.setName(request.getName());
-        user.setUserName(request.getUserName());
+        user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = userRepository.save(user);
 
-        return new AuthResponseDTO("registered", saved.getId(), saved.getUserName(), saved.getEmail());
+        return new AuthResponseDTO("registered", saved.getId(), saved.getUsername(), saved.getEmail());
     }
 
     @Transactional(readOnly = true)
     public AuthResponseDTO login(LoginRequestDTO request) {
-        User user = userRepository.findByUserName(request.getUserName())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        return new AuthResponseDTO("login_ok", user.getId(), user.getUserName(), user.getEmail());
+        return new AuthResponseDTO("login_ok", user.getId(), user.getUsername(), user.getEmail());
     }
 }
