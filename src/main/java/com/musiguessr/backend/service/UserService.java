@@ -1,6 +1,7 @@
 package com.musiguessr.backend.service;
 
 import com.musiguessr.backend.dto.UserResponseDTO;
+import com.musiguessr.backend.dto.MeProfileDTO;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
@@ -23,11 +24,34 @@ public class UserService {
         return toDto(user);
     }
 
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        userRepository.deleteById(id);
+    }
+
     @Transactional(readOnly = true)
     public List<UserResponseDTO> listUsers() {
         return userRepository.findAll().stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MeProfileDTO getProfile(Long userId) {
+        UserRepository.ProfileProjection projection = userRepository.findProfileByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return new MeProfileDTO(
+                projection.getId(),
+                projection.getName(),
+                projection.getUserName(),
+                projection.getEmail(),
+                projection.getTotalScore(),
+                projection.getGamesPlayed(),
+                projection.getLastPlayedAt());
     }
 
     private UserResponseDTO toDto(User user) {
