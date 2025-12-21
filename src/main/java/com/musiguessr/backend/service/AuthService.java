@@ -6,11 +6,13 @@ import com.musiguessr.backend.dto.auth.RegisterRequestDTO;
 import com.musiguessr.backend.model.Role;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
+import com.musiguessr.backend.security.CustomUserDetails;
 import com.musiguessr.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,8 +52,9 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponseDTO login(LoginRequestDTO request) {
+        Authentication authentication;
         try {
-            authenticationManager.authenticate(
+            authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getUsername(),
                             request.getPassword()
@@ -61,8 +64,8 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
         String token = jwtUtil.generateToken(user.getUsername());
 
