@@ -51,7 +51,7 @@ class MusicControllerTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song");
         request.setFileName("song.mp3");
-        request.setContent_type("audio/mpeg");
+        request.setContentType("audio/mpeg");
 
         PresignResponseDTO response = new PresignResponseDTO("OK", "key/123", "http://s3-url");
 
@@ -61,7 +61,7 @@ class MusicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.upload_url").value("http://s3-url"));
+                .andExpect(jsonPath("$.uploadUrl").value("http://s3-url"));
     }
 
     @Test
@@ -69,8 +69,8 @@ class MusicControllerTest {
         UploadConfirmRequestDTO request = new UploadConfirmRequestDTO();
         request.setKey("key/123");
         request.setName("Song");
-        request.setGenre_id(1L);
-        request.setArtist_id(2L);
+        request.setGenreId(1L);
+        request.setArtistId(2L);
 
         UploadConfirmResponseDTO response = new UploadConfirmResponseDTO("Uploaded", 1L, "Song", "http://url");
 

@@ -11,7 +11,5 @@ public class PlaylistRequestDTO {
     private String name;
 
     @NotNull
-    private Long owner_id;
-
-    private Boolean is_curated;
+    private Long ownerId;
 }

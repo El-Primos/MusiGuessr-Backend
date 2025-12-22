@@ -11,10 +11,10 @@ public class UploadConfirmRequestDTO {
     private String name;
 
     @NotNull
-    private Long genre_id;
+    private Long genreId;
 
     @NotNull
-    private Long artist_id;
+    private Long artistId;
 
     @NotBlank
     private String key;

@@ -12,14 +12,14 @@ public class PlaylistResponseDTO {
     private String message;
     private Long id;
     private String name;
-    private Long owner_id;
-    private OffsetDateTime created_at;
+    private Long ownerId;
+    private OffsetDateTime createdAt;
 
-    public PlaylistResponseDTO(Long id, String name, Long owner_id, OffsetDateTime created_at) {
+    public PlaylistResponseDTO(Long id, String name, Long ownerId, OffsetDateTime createdAt) {
         this.message = null;
         this.id = id;
         this.name = name;
-        this.owner_id = owner_id;
-        this.created_at = created_at;
+        this.ownerId = ownerId;
+        this.createdAt = createdAt;
     }
 }

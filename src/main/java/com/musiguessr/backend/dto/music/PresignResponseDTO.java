@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class PresignResponseDTO {
     private String message;
     private String key;
-    private String upload_url;
+    private String uploadUrl;
 }

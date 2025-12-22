@@ -52,15 +52,15 @@ public class MusicService {
         }
 
         String expectedType = VALID_FORMATS.get(normalizedExt);
-        if (!expectedType.equals(request.getContent_type())) {
+        if (!expectedType.equals(request.getContentType())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(
-                    "Error: Mismatch! Expected '%s' for .%s extension, but got '%s'",
-                    expectedType, normalizedExt, request.getContent_type()
+                    "Expected '%s' for .%s extension, but got '%s'",
+                    expectedType, normalizedExt, request.getContentType()
             ));
         }
 
         String uniqueKey = "music/" + UUID.randomUUID() + "_" + request.getFileName();
-        String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, request.getContent_type());
+        String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, request.getContentType());
 
         return new PresignResponseDTO("Presign upload url created", uniqueKey, uploadUrl);
     }
@@ -77,10 +77,10 @@ public class MusicService {
         music.setName(request.getName());
         music.setUrl(url);
 
-        music.setGenre(genreRepository.findById(request.getGenre_id())
+        music.setGenre(genreRepository.findById(request.getGenreId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found")));
 
-        music.setArtist(artistRepository.findById(request.getArtist_id())
+        music.setArtist(artistRepository.findById(request.getArtistId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artist not found with ID")));
 
         Music savedMusic = musicRepository.save(music);
@@ -125,15 +125,14 @@ public class MusicService {
             music.setName(request.getName());
         }
 
-        if (request.getGenre_id() != null) {
-            Genre genre = genreRepository.findById(request.getGenre_id())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Genre not found with ID: " + request.getGenre_id()));
+        if (request.getGenreId() != null) {
+            Genre genre = genreRepository.findById(request.getGenreId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found"));
             music.setGenre(genre);
         }
 
-        if (request.getArtist_id() != null) {
-            Artist artist = artistRepository.findById(request.getArtist_id())
+        if (request.getArtistId() != null) {
+            Artist artist = artistRepository.findById(request.getArtistId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artist not found"));
             music.setArtist(artist);
         }

@@ -7,7 +7,7 @@ import lombok.Data;
 public class PlaylistReorderItemDTO {
 
     @NotNull
-    private Long song_id;
+    private Long songId;
 
     @NotNull
     private Integer position;

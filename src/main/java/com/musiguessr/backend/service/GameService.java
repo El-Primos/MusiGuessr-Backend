@@ -142,7 +142,7 @@ public class GameService {
             String needle = status.trim().toLowerCase();
             mapped = mapped.stream()
                     .filter(d -> d.getStatus() != null && d.getStatus().toLowerCase().equals(needle))
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return mapped.stream()
