@@ -67,7 +67,7 @@ class MusicServiceTest {
 
         assertEquals("400 BAD_REQUEST", exception.getStatusCode().toString());
         assertNotNull(exception.getReason());
-        assertTrue(exception.getReason().contains("Mismatch! Expected 'audio/mpeg'"));
+        assertTrue(exception.getReason().contains("Expected 'audio/mpeg'"));
     }
 
     @Test

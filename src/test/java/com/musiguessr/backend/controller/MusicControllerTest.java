@@ -61,7 +61,7 @@ class MusicControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.upload_url").value("http://s3-url"));
+                .andExpect(jsonPath("$.uploadUrl").value("http://s3-url"));
     }
 
     @Test
