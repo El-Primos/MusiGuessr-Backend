@@ -20,16 +20,11 @@ public class Music {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "genre_id",
-            foreignKey = @ForeignKey(name = "fk_music_genre")
-    )
+    @JoinColumn(name = "genre_id", foreignKey = @ForeignKey(name = "fk_music_genre"))
     private Genre genre;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "artist_id",
-            foreignKey = @ForeignKey(name = "fk_music_artist")
+    @JoinColumn(name = "artist_id", foreignKey = @ForeignKey(name = "fk_music_artist")
     )
     private Artist artist;
 

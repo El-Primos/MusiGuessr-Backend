@@ -12,5 +12,5 @@ public class PresignRequestDTO {
     private String fileName;
 
     @NotBlank
-    private String content_type;
+    private String contentType;
 }

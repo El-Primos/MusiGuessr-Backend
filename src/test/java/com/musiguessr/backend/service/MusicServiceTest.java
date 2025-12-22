@@ -41,14 +41,14 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContent_type("audio/mpeg");
+        request.setContentType("audio/mpeg");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
         when(s3Service.createPresignedUploadUrl(anyString(), anyString())).thenReturn("http://s3-url.com");
 
         PresignResponseDTO response = musicService.presign(request);
 
-        assertNotNull(response.getUpload_url());
+        assertNotNull(response.getUploadUrl());
         assertTrue(response.getKey().contains("music/"));
         assertTrue(response.getKey().contains("test.mp3"));
     }
@@ -58,7 +58,7 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.mp3");
-        request.setContent_type("audio/wav");
+        request.setContentType("audio/wav");
 
         when(musicRepository.existsByName("Song Name")).thenReturn(false);
 
@@ -75,7 +75,7 @@ class MusicServiceTest {
         PresignRequestDTO request = new PresignRequestDTO();
         request.setName("Song Name");
         request.setFileName("test.exe");
-        request.setContent_type("application/octet-stream");
+        request.setContentType("application/octet-stream");
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> musicService.presign(request));
@@ -89,8 +89,8 @@ class MusicServiceTest {
         UploadConfirmRequestDTO request = new UploadConfirmRequestDTO();
         request.setKey("music/some-uuid_song.mp3");
         request.setName("New Song");
-        request.setGenre_id(1L);
-        request.setArtist_id(2L);
+        request.setGenreId(1L);
+        request.setArtistId(2L);
 
         when(s3Service.doesFileExist(request.getKey())).thenReturn(true);
         when(s3Service.getUrl(request.getKey())).thenReturn("http://full-url.com");
