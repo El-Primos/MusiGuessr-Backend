@@ -34,7 +34,7 @@ public class PlaylistService {
     public List<PlaylistResponseDTO> getPlaylists(Long ownerId, String name, Integer limit, Integer offset) {
         Stream<Playlist> stream = playlistRepository.findAll().stream();
 
-        if (ownerId != null) stream = stream.filter(p -> Objects.equals(p.getUserId(), ownerId));
+        if (ownerId != null) stream = stream.filter(p -> Objects.equals(p.getOwnerId(), ownerId));
         if (StringUtils.hasText(name)) {
             String needle = name.trim().toLowerCase();
             stream = stream.filter(p -> p.getName() != null && p.getName().toLowerCase().contains(needle));
@@ -59,7 +59,7 @@ public class PlaylistService {
     public PlaylistResponseDTO createPlaylist(PlaylistRequestDTO request) {
         Playlist playlist = new Playlist();
         playlist.setName(request.getName());
-        playlist.setUserId(request.getOwnerId());
+        playlist.setOwnerId(request.getOwnerId());
 
         try {
             Playlist saved = playlistRepository.save(playlist);
@@ -196,8 +196,7 @@ public class PlaylistService {
         return new PlaylistResponseDTO(
                 playlist.getId(),
                 playlist.getName(),
-                playlist.getUserId(),
-                playlist.getCreatedAt()
+                playlist.getOwnerId()
         );
     }
 
@@ -206,18 +205,17 @@ public class PlaylistService {
                 message,
                 playlist.getId(),
                 playlist.getName(),
-                playlist.getUserId(),
-                playlist.getCreatedAt()
+                playlist.getOwnerId()
         );
     }
 
     private MusicResponseDTO mapMusicToDTO(Music music) {
         GenreResponseDTO genreDTO = (music.getGenre() != null)
-                ? new GenreResponseDTO(music.getGenre().getId(), music.getGenre().getName())
+                ? new GenreResponseDTO(music.getGenreId(), music.getGenre().getName())
                 : null;
 
         ArtistResponseDTO artistDTO = (music.getArtist() != null)
-                ? new ArtistResponseDTO(music.getArtist().getId(), music.getArtist().getName())
+                ? new ArtistResponseDTO(music.getArtistId(), music.getArtist().getName())
                 : null;
 
         return new MusicResponseDTO(

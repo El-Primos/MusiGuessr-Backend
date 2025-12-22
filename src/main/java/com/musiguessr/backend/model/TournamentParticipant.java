@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tournament_info", schema = "musiguessr_schema")
+@Table(name = "tournament_info")
 public class TournamentParticipant {
 
     @EmbeddedId
@@ -17,18 +17,12 @@ public class TournamentParticipant {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tournamentId")
-    @JoinColumn(
-            name = "tournament_id",
-            foreignKey = @ForeignKey(name = "tournament_info_tournament_id_fkey")
-    )
+    @JoinColumn(name = "tournament_id")
     private Tournament tournament;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
-    @JoinColumn(
-            name = "user_id",
-            foreignKey = @ForeignKey(name = "tournament_info_user_id_fkey")
-    )
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "user_score", nullable = false)

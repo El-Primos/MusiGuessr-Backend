@@ -9,8 +9,12 @@ import com.musiguessr.backend.model.Music;
 import com.musiguessr.backend.repository.ArtistRepository;
 import com.musiguessr.backend.repository.GenreRepository;
 import com.musiguessr.backend.repository.MusicRepository;
+import com.musiguessr.backend.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -74,6 +78,7 @@ public class MusicService {
         String url = s3Service.getUrl(request.getKey());
 
         Music music = new Music();
+        music.setOwnerId(getUserId());
         music.setName(request.getName());
         music.setUrl(url);
 
@@ -94,8 +99,8 @@ public class MusicService {
         Stream<Music> stream = musicRepository.findAll().stream();
 
         if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
-        if (artistId != null) stream = stream.filter(p -> Objects.equals(p.getArtist().getId(), artistId));
-        if (genreId != null) stream = stream.filter(p -> Objects.equals(p.getGenre().getId(), genreId));
+        if (artistId != null) stream = stream.filter(p -> Objects.equals(p.getArtistId(), artistId));
+        if (genreId != null) stream = stream.filter(p -> Objects.equals(p.getGenreId(), genreId));
 
         int safeOffset = (offset == null || offset < 0) ? 0 : offset;
         int safeLimit = (limit == null || limit < 0) ? 50 : limit;
@@ -158,11 +163,11 @@ public class MusicService {
 
     private MusicResponseDTO mapToDTO(Music music) {
         GenreResponseDTO genreDTO = (music.getGenre() != null)
-                ? new GenreResponseDTO(music.getGenre().getId(), music.getGenre().getName())
+                ? new GenreResponseDTO(music.getGenreId(), music.getGenre().getName())
                 : null;
 
         ArtistResponseDTO artistDTO = (music.getArtist() != null)
-                ? new ArtistResponseDTO(music.getArtist().getId(), music.getArtist().getName())
+                ? new ArtistResponseDTO(music.getArtistId(), music.getArtist().getName())
                 : null;
 
         return new MusicResponseDTO(
@@ -172,5 +177,20 @@ public class MusicService {
                 genreDTO,
                 artistDTO
         );
+    }
+
+    private static Long getUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isRegistered =
+                auth != null &&
+                        auth.isAuthenticated() &&
+                        !(auth instanceof AnonymousAuthenticationToken);
+
+        if (!isRegistered) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        return userDetails.getUser().getId();
     }
 }

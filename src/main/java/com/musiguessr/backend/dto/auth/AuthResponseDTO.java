@@ -1,6 +1,6 @@
 package com.musiguessr.backend.dto.auth;
 
-import com.musiguessr.backend.model.Role;
+import com.musiguessr.backend.model.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +23,7 @@ public class AuthResponseDTO {
             Long id,
             String username,
             String email,
-            Role role,
+            UserRole userRole,
             String accessToken,
             String refreshToken
     ) {
@@ -31,7 +31,7 @@ public class AuthResponseDTO {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.role = role.name();
+        this.role = userRole.name();
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.tokenType = "Bearer";

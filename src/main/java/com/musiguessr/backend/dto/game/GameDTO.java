@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 public class GameDTO {
     private Long id;
     private String status;
-    private String type;
     private Long playlistId;
 
     private Integer totalScore;

@@ -10,40 +10,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tournaments", schema = "musiguessr_schema")
+@Table(name = "tournaments")
 public class Tournament {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tournaments_id_seq_gen")
-    @SequenceGenerator(
-            name = "tournaments_id_seq_gen",
-            sequenceName = "musiguessr_schema.tournaments_id_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "creator_id", nullable = false)
-    private Long creatorId;
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "creator_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "tournaments_creator_id_fkey")
-    )
-    private User creator;
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
 
-    @Column(name = "playlist_id")
+    @Column(name = "playlist_id", insertable = false, updatable = false)
     private Long playlistId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "playlist_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "tournaments_playlist_id_fkey")
-    )
+    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
     @Column(nullable = false)
@@ -54,14 +39,14 @@ public class Tournament {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private TournamentStatus status = TournamentStatus.UPCOMING;
+    private TournamentState state = TournamentState.UPCOMING;
 
-    @Column(name = "create_date", insertable = false, updatable = false)
-    private OffsetDateTime createDate;
-
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     private OffsetDateTime startDate;
 
-    @Column(name = "end_date")
+    @Column(name = "end_date", nullable = false)
     private OffsetDateTime endDate;
+
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
 }

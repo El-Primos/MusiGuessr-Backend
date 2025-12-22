@@ -85,7 +85,7 @@ public class UserService {
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getScore(),
-                user.getCreatedAt());
+                user.getScore()
+        );
     }
 }

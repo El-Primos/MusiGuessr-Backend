@@ -1,7 +1,7 @@
 package com.musiguessr.backend.controller;
 
 import com.musiguessr.backend.dto.tournament.*;
-import com.musiguessr.backend.model.TournamentStatus;
+import com.musiguessr.backend.model.TournamentState;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
 import com.musiguessr.backend.service.TournamentService;
@@ -30,7 +30,7 @@ public class TournamentController {
 
     @GetMapping
     public ResponseEntity<Page<TournamentResponseDTO>> getTournaments(
-            @RequestParam(value = "status", required = false) TournamentStatus status,
+            @RequestParam(value = "status", required = false) TournamentState status,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             @RequestParam(value = "sort", defaultValue = "createDate") String sortBy,

@@ -5,7 +5,7 @@ import com.musiguessr.backend.dto.auth.LoginRequestDTO;
 import com.musiguessr.backend.dto.auth.LogoutRequestDTO;
 import com.musiguessr.backend.dto.auth.RegisterRequestDTO;
 import com.musiguessr.backend.model.RefreshToken;
-import com.musiguessr.backend.model.Role;
+import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.RefreshTokenRepository;
 import com.musiguessr.backend.repository.UserRepository;
@@ -46,7 +46,7 @@ public class AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.USER);
+        user.setRole(UserRole.USER);
 
         User saved = userRepository.save(user);
         String token = jwtUtil.generateJwtToken(user.getUsername());

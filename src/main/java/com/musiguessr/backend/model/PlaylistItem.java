@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "playlist_items", schema = "musiguessr_schema")
+@Table(name = "playlist_items")
 public class PlaylistItem {
 
     @EmbeddedId
@@ -17,17 +17,13 @@ public class PlaylistItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("playlistId")
-    @JoinColumn(
-            name = "playlist_id",
-            foreignKey = @ForeignKey(name = "playlist_items_playlist_id_fkey")
-    )
+    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
+    @Column(name = "music_id", nullable = false)
+    private Long musicId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "music_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "playlist_items_music_id_fkey")
-    )
+    @JoinColumn(name = "music_id", nullable = false, insertable = false, updatable = false)
     private Music music;
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class PlaylistAddSongRequestDTO {
+
     @NotNull
     private Long songId;
 

@@ -55,10 +55,8 @@ public class GameService {
         }
 
         Game game = new Game();
-        game.setCreatorId(authUserId);
+        game.setOwnerId(authUserId);
         game.setPlaylistId(request.getPlaylistId());
-        game.setType("singleplayer");
-        game.setIsOffline(Boolean.TRUE.equals(request.getIsOffline()));
 
         Game saved = gameRepository.save(game);
         return mapGameDTO(saved, "planned", 0, null);
@@ -128,7 +126,7 @@ public class GameService {
 
         Long effectiveUserId = (userId != null) ? userId : authUserId;
         if (effectiveUserId != null) {
-            stream = stream.filter(g -> Objects.equals(g.getCreatorId(), effectiveUserId));
+            stream = stream.filter(g -> Objects.equals(g.getOwnerId(), effectiveUserId));
         }
 
         int safeOffset = (offset == null || offset < 0) ? 0 : offset;
@@ -335,7 +333,7 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
-        if (!Objects.equals(game.getCreatorId(), authUserId)) {
+        if (!Objects.equals(game.getOwnerId(), authUserId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
         return game;
@@ -361,7 +359,6 @@ public class GameService {
         return new GameDTO(
                 game.getId(),
                 status,
-                game.getType(),
                 game.getPlaylistId(),
                 totalScore,
                 startedAt,

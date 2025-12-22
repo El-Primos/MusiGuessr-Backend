@@ -19,13 +19,25 @@ public class Music {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "genre_id", foreignKey = @ForeignKey(name = "fk_music_genre"))
-    private Genre genre;
+    @Column(name = "owner_id")
+    private Long ownerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id", foreignKey = @ForeignKey(name = "fk_music_artist")
-    )
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
+
+    @Column(name = "genre_id")
+    private Long genreId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", insertable = false, updatable = false)
+    private Genre genre;
+
+    @Column(name = "artist_id")
+    private Long artistId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id", insertable = false, updatable = false)
     private Artist artist;
 
     @Column(nullable = false)
