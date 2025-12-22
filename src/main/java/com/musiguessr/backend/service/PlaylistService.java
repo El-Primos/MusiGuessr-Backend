@@ -31,12 +31,12 @@ public class PlaylistService {
     private final MusicRepository musicRepository;
 
     @Transactional(readOnly = true)
-    public List<PlaylistResponseDTO> getPlaylists(Long ownerId, Boolean isCurated, String q, Integer limit, Integer offset) {
+    public List<PlaylistResponseDTO> getPlaylists(Long ownerId, String name, Integer limit, Integer offset) {
         Stream<Playlist> stream = playlistRepository.findAll().stream();
 
         if (ownerId != null) stream = stream.filter(p -> Objects.equals(p.getUserId(), ownerId));
-        if (StringUtils.hasText(q)) {
-            String needle = q.trim().toLowerCase();
+        if (StringUtils.hasText(name)) {
+            String needle = name.trim().toLowerCase();
             stream = stream.filter(p -> p.getName() != null && p.getName().toLowerCase().contains(needle));
         }
 
@@ -59,7 +59,7 @@ public class PlaylistService {
     public PlaylistResponseDTO createPlaylist(PlaylistRequestDTO request) {
         Playlist playlist = new Playlist();
         playlist.setName(request.getName());
-        playlist.setUserId(request.getOwner_id());
+        playlist.setUserId(request.getOwnerId());
 
         try {
             Playlist saved = playlistRepository.save(playlist);
@@ -109,7 +109,7 @@ public class PlaylistService {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
 
-        Music music = musicRepository.findById(request.getSong_id())
+        Music music = musicRepository.findById(request.getSongId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Music not found"));
 
         if (playlistItemRepository.existsByIdPlaylistIdAndMusicId(playlistId, music.getId())) {
@@ -167,8 +167,8 @@ public class PlaylistService {
             if (it.getPosition() == null || it.getPosition() < 1) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
             }
-            if (!currentMusicById.containsKey(it.getSong_id())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Song not in playlist: " + it.getSong_id());
+            if (!currentMusicById.containsKey(it.getSongId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Song not in playlist: " + it.getSongId());
             }
         }
 
@@ -179,7 +179,7 @@ public class PlaylistService {
             PlaylistItem pi = new PlaylistItem();
             pi.setId(new PlaylistItemId(playlistId, it.getPosition()));
             pi.setPlaylist(playlist);
-            pi.setMusic(currentMusicById.get(it.getSong_id()));
+            pi.setMusic(currentMusicById.get(it.getSongId()));
             recreated.add(pi);
         }
 

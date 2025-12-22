@@ -21,13 +21,12 @@ public class PlaylistController {
 
     @GetMapping
     public ResponseEntity<List<PlaylistResponseDTO>> getPlaylists(
-            @RequestParam(value = "owner_id", required = false) Long ownerId,
-            @RequestParam(value = "is_curated", required = false) Boolean isCurated,
-            @RequestParam(value = "q", required = false) String q,
-            @RequestParam(value = "limit", required = false) Integer limit,
-            @RequestParam(value = "offset", required = false) Integer offset
+            @RequestParam(required = false) Long ownerId,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer limit,
+            @RequestParam(required = false) Integer offset
     ) {
-        return ResponseEntity.ok(playlistService.getPlaylists(ownerId, isCurated, q, limit, offset));
+        return ResponseEntity.ok(playlistService.getPlaylists(ownerId, name, limit, offset));
     }
 
     @GetMapping("/{id}")
@@ -68,10 +67,9 @@ public class PlaylistController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{id}/songs/{song_id}")
+    @DeleteMapping("/{id}/songs/{songId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> removeSongFromPlaylist(@PathVariable Long id,
-                                                       @PathVariable("song_id") Long songId) {
+    public ResponseEntity<Void> removeSongFromPlaylist(@PathVariable Long id, @PathVariable Long songId) {
         playlistService.removeSongFromPlaylist(id, songId);
         return ResponseEntity.noContent().build();
     }
