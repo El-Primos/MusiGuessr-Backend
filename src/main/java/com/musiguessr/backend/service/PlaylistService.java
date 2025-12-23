@@ -105,7 +105,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void addSongToPlaylist(Long playlistId, PlaylistAddSongRequestDTO request) {
+    public void addSongToPlaylist(Long playlistId, PlaylistItemRequestDTO request) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
 
@@ -154,7 +154,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void reorder(Long playlistId, PlaylistReorderRequestDTO request) {
+    public void reorder(Long playlistId, PlaylistReorderItemsRequestDTO request) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
 
@@ -163,7 +163,7 @@ public class PlaylistService {
                 .map(PlaylistItem::getMusic)
                 .collect(Collectors.toMap(Music::getId, m -> m));
 
-        for (PlaylistReorderItemDTO it : request.getItems()) {
+        for (PlaylistItemRequestDTO it : request.getItems()) {
             if (it.getPosition() == null || it.getPosition() < 1) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
             }
@@ -175,7 +175,7 @@ public class PlaylistService {
         playlistItemRepository.deleteAll(current);
 
         List<PlaylistItem> recreated = new ArrayList<>();
-        for (PlaylistReorderItemDTO it : request.getItems()) {
+        for (PlaylistItemRequestDTO it : request.getItems()) {
             PlaylistItem pi = new PlaylistItem();
             pi.setId(new PlaylistItemId(playlistId, it.getPosition()));
             pi.setPlaylist(playlist);

@@ -62,7 +62,7 @@ public class PlaylistController {
     @PostMapping("/{id}/songs")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> addSongToPlaylist(@PathVariable Long id,
-                                                  @Valid @RequestBody PlaylistAddSongRequestDTO request) {
+                                                  @Valid @RequestBody PlaylistItemRequestDTO request) {
         playlistService.addSongToPlaylist(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -77,7 +77,7 @@ public class PlaylistController {
     @PostMapping("/{id}/reorder")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> reorder(@PathVariable Long id,
-                                        @Valid @RequestBody PlaylistReorderRequestDTO request) {
+                                        @Valid @RequestBody PlaylistReorderItemsRequestDTO request) {
         playlistService.reorder(id, request);
         return ResponseEntity.ok().build();
     }
