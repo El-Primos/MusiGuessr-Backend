@@ -33,7 +33,7 @@ public class TournamentController {
             @RequestParam(value = "status", required = false) TournamentState status,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
-            @RequestParam(value = "sort", defaultValue = "createDate") String sortBy,
+            @RequestParam(value = "sort", defaultValue = "createdAt") String sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") String direction
     ) {
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
@@ -66,16 +66,20 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.joinTournament(userId, id));
     }
 
-    @PostMapping("/{id}/start")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TournamentResponseDTO> startTournament(@PathVariable Long id) {
-        return ResponseEntity.ok(tournamentService.startTournament(id));
+    @PostMapping("/{id}/leave")
+    public ResponseEntity<TournamentResponseDTO> leaveTournament(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id
+    ) {
+        Long userId = getUserIdFromUserDetails(userDetails);
+        return ResponseEntity.ok(tournamentService.leaveTournament(userId, id));
     }
 
-    @PostMapping("/{id}/end")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TournamentResponseDTO> endTournament(@PathVariable Long id) {
-        return ResponseEntity.ok(tournamentService.endTournament(id));
+    public ResponseEntity<String> deleteTournament(@PathVariable Long id) {
+        tournamentService.deleteTournament(id);
+        return ResponseEntity.ok("Tournament deleted successfully");
     }
 
     @GetMapping("/{id}/participants")

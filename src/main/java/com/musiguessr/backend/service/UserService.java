@@ -53,7 +53,9 @@ public class UserService {
                 projection.getEmail(),
                 projection.getTotalScore(),
                 projection.getGamesPlayed(),
-                projection.getLastPlayedAt());
+                projection.getLastPlayedAt() != null
+                        ? projection.getLastPlayedAt().atOffset(java.time.ZoneOffset.UTC)
+                        : null);
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +65,9 @@ public class UserService {
                         p.getGameId(),
                         p.getPlaylistId(),
                         p.getTotalScore(),
-                        p.getPlayedAt()))
+                        p.getPlayedAt() != null
+                                ? p.getPlayedAt().atOffset(java.time.ZoneOffset.UTC)
+                                : null))
                 .toList();
     }
 
@@ -74,8 +78,12 @@ public class UserService {
                         p.getTournamentId(),
                         p.getUserScore(),
                         p.getStatus(),
-                        p.getStartsAt(),
-                        p.getEndsAt()))
+                        p.getStartsAt() != null
+                                ? p.getStartsAt().atOffset(java.time.ZoneOffset.UTC)
+                                : null,
+                        p.getEndsAt() != null
+                                ? p.getEndsAt().atOffset(java.time.ZoneOffset.UTC)
+                                : null))
                 .toList();
     }
 

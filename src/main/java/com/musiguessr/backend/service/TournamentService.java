@@ -57,6 +57,7 @@ public class TournamentService {
         tournament.setState(TournamentState.UPCOMING);
         tournament.setStartDate(request.getStartDate());
         tournament.setEndDate(request.getEndDate());
+        tournament.setCreatedAt(OffsetDateTime.now());
 
         Tournament saved = tournamentRepository.save(tournament);
         return mapToResponseDTO(saved);
@@ -105,6 +106,20 @@ public class TournamentService {
 
         participantRepository.save(participant);
 
+        return mapToResponseDTO(tournament);
+    }
+
+    @Transactional
+    public TournamentResponseDTO leaveTournament(Long userId, Long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+
+        TournamentParticipantId id = new TournamentParticipantId(tournamentId, userId);
+        if (!participantRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is not a participant of this tournament");
+        }
+
+        participantRepository.deleteById(id);
         return mapToResponseDTO(tournament);
     }
 
@@ -182,6 +197,14 @@ public class TournamentService {
 
         participant.setUserScore(participant.getUserScore() + scoreToAdd);
         participantRepository.save(participant);
+    }
+
+    @Transactional
+    public void deleteTournament(Long tournamentId) {
+        if (!tournamentRepository.existsById(tournamentId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found");
+        }
+        tournamentRepository.deleteById(tournamentId);
     }
 
     // ---------------- helpers ----------------

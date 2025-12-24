@@ -17,7 +17,7 @@ public class TournamentResponseDTO {
     private Long creatorId;
     private String creatorUsername;
     private TournamentState status;
-    private OffsetDateTime createDate;
+    private OffsetDateTime createdAt;
     private OffsetDateTime startDate;
     private OffsetDateTime endDate;
     private Integer participantCount;
