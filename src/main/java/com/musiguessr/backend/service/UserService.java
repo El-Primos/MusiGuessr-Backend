@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 public class UserService {
 
     private final UserRepository userRepository;
+    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
     public UserResponseDTO getUser(Long id) {
