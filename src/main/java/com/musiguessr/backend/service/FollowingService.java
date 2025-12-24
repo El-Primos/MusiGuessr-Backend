@@ -21,6 +21,7 @@ public class FollowingService {
 
     private final FollowingRepository followingRepository;
     private final UserRepository userRepository;
+    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional
     public void sendFollowRequest(Long requesterId, Long targetId) {
