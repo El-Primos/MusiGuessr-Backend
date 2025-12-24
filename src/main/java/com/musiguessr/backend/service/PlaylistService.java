@@ -4,15 +4,16 @@ import com.musiguessr.backend.dto.artist.ArtistResponseDTO;
 import com.musiguessr.backend.dto.genre.GenreResponseDTO;
 import com.musiguessr.backend.dto.music.MusicResponseDTO;
 import com.musiguessr.backend.dto.playlist.*;
-import com.musiguessr.backend.model.Music;
-import com.musiguessr.backend.model.Playlist;
-import com.musiguessr.backend.model.PlaylistItem;
-import com.musiguessr.backend.model.PlaylistItemId;
+import com.musiguessr.backend.model.*;
 import com.musiguessr.backend.repository.MusicRepository;
 import com.musiguessr.backend.repository.PlaylistItemRepository;
 import com.musiguessr.backend.repository.PlaylistRepository;
+import com.musiguessr.backend.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -67,6 +69,59 @@ public class PlaylistService {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Playlist name already exists for this user");
         }
+    }
+
+    @Transactional
+    public PlaylistResponseDTO createRandomPlaylist(PlaylistRandomRequestDTO request) {
+        var criteria = request.getCriteria();
+
+        List<Long> genres = (criteria != null && criteria.getGenres() != null)
+                ? criteria.getGenres()
+                : Collections.emptyList();
+
+        List<Long> artists = (criteria != null && criteria.getArtists() != null)
+                ? criteria.getArtists()
+                : Collections.emptyList();
+
+        boolean filterGenres = !genres.isEmpty();
+        boolean filterArtists = !artists.isEmpty();
+
+        List<MusicRepository.ProfileProjection> musics = musicRepository.findRandomMusics(
+                request.getLength(),
+                genres,
+                filterGenres,
+                artists,
+                filterArtists
+        );
+        if (musics.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No music available");
+        }
+
+        Playlist playlist = new Playlist();
+        playlist.setName(request.getName());
+        playlist.setOwnerId(getOwnerId());
+
+        Playlist savedPlaylist = playlistRepository.save(playlist);
+        Long playlistId = savedPlaylist.getId();
+
+
+        List<PlaylistItemRequestDTO> items = IntStream.range(0, musics.size())
+                .mapToObj(i -> {
+                    MusicRepository.ProfileProjection music = musics.get(i);
+
+                    PlaylistItemRequestDTO dto = new PlaylistItemRequestDTO();
+                    dto.setSongId(music.getId());
+                    dto.setPosition(i + 1);
+                    return dto;
+                })
+                .toList();
+
+        PlaylistBatchItemRequestDTO batchRequest = new PlaylistBatchItemRequestDTO();
+        batchRequest.setItems(items);
+
+        addSongsToPlaylist(playlistId, batchRequest);
+
+        return mapToDTO(savedPlaylist);
     }
 
     @Transactional
@@ -128,19 +183,78 @@ public class PlaylistService {
             position = request.getPosition();
         } else {
             // max+1
-            Integer max = playlistItemRepository.findByIdPlaylistIdOrderByIdPositionAsc(playlistId).stream()
-                    .map(it -> it.getId().getPosition())
-                    .max(Integer::compareTo)
-                    .orElse(0);
+            Integer max = playlistItemRepository.findMaxPositionByIdPlaylistId(playlistId);
             position = max + 1;
         }
 
         PlaylistItem item = new PlaylistItem();
         item.setId(new PlaylistItemId(playlistId, position));
         item.setPlaylist(playlist);
-        item.setMusic(music);
+        item.setMusicId(music.getId());
 
         playlistItemRepository.save(item);
+    }
+
+    @Transactional
+    public void addSongsToPlaylist(Long playlistId, PlaylistBatchItemRequestDTO request) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
+
+        List<Long> requestedMusicIds =
+                request.getItems().stream().map(PlaylistItemRequestDTO::getSongId).distinct().toList();
+        if (requestedMusicIds.size() < request.getItems().size()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Request contains duplicate items");
+        }
+
+        List<Music> foundMusics = musicRepository.findAllById(requestedMusicIds);
+
+        if (foundMusics.size() != requestedMusicIds.size()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some songs not found");
+        }
+
+        Set<Long> existingMusicIdsInPlaylist = playlistItemRepository.findMusicIdsByIdPlaylistId(playlistId);
+        Set<Integer> positions = playlistItemRepository.findPositionsByIdPlaylistId(playlistId);
+
+        Integer dbMaxPosition = playlistItemRepository.findMaxPositionByIdPlaylistId(playlistId);
+        int currentMaxPosition = (dbMaxPosition != null) ? dbMaxPosition : 0;
+
+        List<PlaylistItem> itemsToSave = new ArrayList<>();
+
+        Set<Integer> processedPositionsInBatch = new HashSet<>();
+
+        for (PlaylistItemRequestDTO req : request.getItems()) {
+            if (existingMusicIdsInPlaylist.contains(req.getSongId())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Song " + req.getSongId() + " already in " +
+                        "playlist");
+            }
+
+            int finalPosition;
+            if (req.getPosition() != null) {
+                if (req.getPosition() < 1) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
+                }
+                if (positions.contains(req.getPosition()) || processedPositionsInBatch.contains(req.getPosition())) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Position " + req.getPosition() + " is already taken");
+                }
+                finalPosition = req.getPosition();
+            } else {
+                do {
+                    currentMaxPosition++;
+                } while (positions.contains(currentMaxPosition) || processedPositionsInBatch.contains(currentMaxPosition));
+                finalPosition = currentMaxPosition;
+            }
+
+            processedPositionsInBatch.add(finalPosition);
+
+            PlaylistItem item = new PlaylistItem();
+            item.setId(new PlaylistItemId(playlistId, finalPosition));
+            item.setPlaylist(playlist);
+            item.setMusicId(req.getSongId());
+
+            itemsToSave.add(item);
+        }
+
+        playlistItemRepository.saveAll(itemsToSave);
     }
 
     @Transactional
@@ -154,7 +268,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void reorder(Long playlistId, PlaylistReorderItemsRequestDTO request) {
+    public void reorder(Long playlistId, PlaylistBatchItemRequestDTO request) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
 
@@ -168,7 +282,7 @@ public class PlaylistService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position must be > 0");
             }
             if (!currentMusicById.containsKey(it.getSongId())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Song not in playlist: " + it.getSongId());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Song not in playlist");
             }
         }
 
@@ -190,6 +304,22 @@ public class PlaylistService {
         if (!playlistRepository.existsById(playlistId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found");
         }
+    }
+
+    private static Long getOwnerId() {
+        Long ownerId = 0L;
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            User user = userDetails.getUser();
+
+            if (user.getRole() == UserRole.ADMIN) {
+                ownerId = user.getId();
+            }
+        }
+
+        return ownerId;
     }
 
     private PlaylistResponseDTO mapToDTO(Playlist playlist) {

@@ -40,6 +40,12 @@ public class PlaylistController {
         return ResponseEntity.status(HttpStatus.CREATED).body(playlistService.createPlaylist(request));
     }
 
+    @PostMapping("/random")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PlaylistResponseDTO> createRandomPlaylist(@Valid @RequestBody PlaylistRandomRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(playlistService.createRandomPlaylist(request));
+    }
+
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Long id,
@@ -67,6 +73,14 @@ public class PlaylistController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/{id}/songs/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> addSongsToPlaylist(@PathVariable Long id,
+                                                   @RequestBody @Valid PlaylistBatchItemRequestDTO request) {
+        playlistService.addSongsToPlaylist(id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @DeleteMapping("/{id}/songs/{songId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> removeSongFromPlaylist(@PathVariable Long id, @PathVariable Long songId) {
@@ -77,7 +91,7 @@ public class PlaylistController {
     @PostMapping("/{id}/reorder")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> reorder(@PathVariable Long id,
-                                        @Valid @RequestBody PlaylistReorderItemsRequestDTO request) {
+                                        @Valid @RequestBody PlaylistBatchItemRequestDTO request) {
         playlistService.reorder(id, request);
         return ResponseEntity.ok().build();
     }
