@@ -16,4 +16,5 @@ public class MeProfileDTO {
     private Integer totalScore;
     private Long gamesPlayed;
     private OffsetDateTime lastPlayedAt;
+    private Long tournamentsAttended;
 }

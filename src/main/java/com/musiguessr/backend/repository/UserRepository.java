@@ -20,6 +20,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         Integer getTotalScore();
         Long getGamesPlayed();
         java.time.Instant getLastPlayedAt();
+        Long getTournamentsAttended();
     }
 
     interface GameHistoryProjection {
@@ -48,7 +49,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 (SELECT MAX(g.created_at)
                  FROM musiguessr_schema.games g
                  JOIN musiguessr_schema.game_history gh2 ON gh2.game_id = g.id
-                 WHERE gh2.user_id = u.id) AS lastPlayedAt
+                 WHERE gh2.user_id = u.id) AS lastPlayedAt,
+                COALESCE((SELECT COUNT(*) FROM musiguessr_schema.tournament_info ti WHERE ti.user_id = u.id), 0) AS tournamentsAttended
             FROM musiguessr_schema.users u
             WHERE u.id = :userId
             """, nativeQuery = true)

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 public class UserService {
 
     private final UserRepository userRepository;
+    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
     public UserResponseDTO getUser(Long id) {
@@ -55,7 +56,9 @@ public class UserService {
                 projection.getGamesPlayed(),
                 projection.getLastPlayedAt() != null
                         ? projection.getLastPlayedAt().atOffset(java.time.ZoneOffset.UTC)
-                        : null);
+                        : null,
+                projection.getTournamentsAttended()
+        );
     }
 
     @Transactional(readOnly = true)
