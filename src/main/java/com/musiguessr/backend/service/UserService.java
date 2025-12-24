@@ -56,7 +56,9 @@ public class UserService {
                 projection.getGamesPlayed(),
                 projection.getLastPlayedAt() != null
                         ? projection.getLastPlayedAt().atOffset(java.time.ZoneOffset.UTC)
-                        : null);
+                        : null,
+                projection.getTournamentsAttended()
+        );
     }
 
     @Transactional(readOnly = true)
