@@ -74,6 +74,18 @@ public class PostService {
                 .toList();
     }
 
+    @Transactional
+    public void deletePost(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
+
+        if (!Objects.equals(post.getUserId(), userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete others' posts");
+        }
+
+        postRepository.delete(post);
+    }
+
     // ------------- helpers -------------
 
     private PostShareResponseDTO mapToResponse(Post post, GameHistory history) {
