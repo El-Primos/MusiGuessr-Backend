@@ -83,6 +83,59 @@ public class TournamentService {
     }
 
     @Transactional
+    public TournamentResponseDTO updateTournament(Long id, Long requesterId, TournamentUpdateRequestDTO request) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+
+        if (!tournament.getOwnerId().equals(requesterId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tournament");
+        }
+
+        OffsetDateTime currentStart = tournament.getStartDate();
+        OffsetDateTime currentEnd = tournament.getEndDate();
+        OffsetDateTime updatedStart = request.getStartDate() != null ? request.getStartDate() : currentStart;
+        OffsetDateTime updatedEnd = request.getEndDate() != null ? request.getEndDate() : currentEnd;
+
+        if (updatedStart != null && updatedEnd != null && updatedStart.isAfter(updatedEnd)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "startDate must be before endDate");
+        }
+
+        if (request.getName() != null && !request.getName().isBlank()) {
+            tournament.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            tournament.setDescription(request.getDescription());
+        }
+        if (request.getStartDate() != null) {
+            tournament.setStartDate(request.getStartDate());
+        }
+        if (request.getEndDate() != null) {
+            tournament.setEndDate(request.getEndDate());
+        }
+
+        Tournament saved = tournamentRepository.save(tournament);
+        return mapToResponseDTO(saved);
+    }
+
+    @Transactional
+    public TournamentResponseDTO updateTournamentState(Long id, Long requesterId, TournamentState newState) {
+        if (newState == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "state is required");
+        }
+
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+
+        if (!tournament.getOwnerId().equals(requesterId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this tournament");
+        }
+
+        tournament.setState(newState);
+        Tournament saved = tournamentRepository.save(tournament);
+        return mapToResponseDTO(saved);
+    }
+
+    @Transactional
     public TournamentResponseDTO joinTournament(Long userId, Long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));

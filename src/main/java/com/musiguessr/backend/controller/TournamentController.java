@@ -54,6 +54,28 @@ public class TournamentController {
                 .body(tournamentService.createTournament(userId, request));
     }
 
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TournamentResponseDTO> updateTournament(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody TournamentUpdateRequestDTO request
+    ) {
+        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+        return ResponseEntity.ok(tournamentService.updateTournament(id, userId, request));
+    }
+
+    @PatchMapping("/{id}/state")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TournamentResponseDTO> updateTournamentState(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody TournamentStateUpdateRequestDTO request
+    ) {
+        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+        return ResponseEntity.ok(tournamentService.updateTournamentState(id, userId, request.getState()));
+    }
+
     @PostMapping("/{id}/join")
     public ResponseEntity<TournamentResponseDTO> joinTournament(
             @AuthenticationPrincipal UserDetails userDetails,
