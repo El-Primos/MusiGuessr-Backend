@@ -45,7 +45,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 u.email,
                 u.score AS totalScore,
                 COALESCE((SELECT COUNT(*) FROM musiguessr_schema.game_history gh WHERE gh.user_id = u.id), 0) AS gamesPlayed,
-                (SELECT MAX(g.played_at)
+                (SELECT MAX(g.created_at)
                  FROM musiguessr_schema.games g
                  JOIN musiguessr_schema.game_history gh2 ON gh2.game_id = g.id
                  WHERE gh2.user_id = u.id) AS lastPlayedAt
@@ -58,12 +58,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             SELECT
                 gh.game_id AS gameId,
                 g.playlist_id AS playlistId,
-                gh.user_score AS totalScore,
-                g.played_at AS playedAt
+                gh.score AS totalScore,
+                g.created_at AS playedAt
             FROM musiguessr_schema.game_history gh
             JOIN musiguessr_schema.games g ON g.id = gh.game_id
             WHERE gh.user_id = :userId
-            ORDER BY g.played_at DESC
+            ORDER BY g.created_at DESC
             """, nativeQuery = true)
     List<GameHistoryProjection> findGameHistoryByUserId(@Param("userId") Long userId);
 

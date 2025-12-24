@@ -109,8 +109,8 @@ public class GameService {
         Game game = ensureOwnedGame(authUserId, gameId);
 
         if (isCompleted(authUserId, gameId)) {
-            int score = gameHistoryRepository.findById(new GameHistoryId(gameId, authUserId))
-                    .map(GameHistory::getUserScore)
+            int score = gameHistoryRepository.findByGameIdAndUserId(gameId, authUserId)
+                    .map(GameHistory::getScore)
                     .orElse(0);
             return mapGameDTO(game, "completed", score, null);
         }
@@ -151,7 +151,7 @@ public class GameService {
 
     @Transactional
     public GameNextDTO next(Long authUserId, Long gameId) {
-        Game game = ensureOwnedGame(authUserId, gameId);
+        ensureOwnedGame(authUserId, gameId);
 
         if (isCompleted(authUserId, gameId)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Game already completed");
@@ -254,8 +254,8 @@ public class GameService {
         Game game = ensureOwnedGame(authUserId, gameId);
 
         if (isCompleted(authUserId, gameId)) {
-            int score = gameHistoryRepository.findById(new GameHistoryId(gameId, authUserId))
-                    .map(GameHistory::getUserScore)
+            int score = gameHistoryRepository.findByGameIdAndUserId(gameId, authUserId)
+                    .map(GameHistory::getScore)
                     .orElse(0);
             return mapGameDTO(game, "completed", score, null);
         }
@@ -270,14 +270,16 @@ public class GameService {
         int finalScore = session.getTotalScore();
 
         GameHistory gh = new GameHistory();
-        gh.setId(new GameHistoryId(gameId, authUserId));
+        gh.setGameId(gameId);
         gh.setGame(game);
+        gh.setUserId(authUserId);
         gh.setUser(userRepository.getReferenceById(authUserId));
-        gh.setUserScore(finalScore);
+        gh.setScore(finalScore);
 
         gameHistoryRepository.save(gh);
 
-        gameRepository.updatePlayedAt(gameId, OffsetDateTime.now());
+        game.setState(GameState.FINISHED);
+        gameRepository.save(game);
 
         sessionStore.remove(gameId);
 
@@ -291,15 +293,15 @@ public class GameService {
     public List<GameResultDTO> getGameResults(Long authUserId, Long gameId) {
         ensureOwnedGame(authUserId, gameId);
 
-        return gameHistoryRepository.findByIdGameId(gameId).stream()
+        return gameHistoryRepository.findByGameId(gameId).stream()
                 .map(gh -> {
                     Game g = gh.getGame();
                     Long playlistId = (g != null) ? g.getPlaylistId() : null;
-                    OffsetDateTime playedAt = (g != null) ? g.getPlayedAt() : null;
+                    OffsetDateTime playedAt = (g != null) ? g.getCreatedAt() : null;
                     return new GameResultDTO(
-                            gh.getId().getGameId(),
-                            gh.getId().getUserId(),
-                            gh.getUserScore(),
+                            gh.getGameId(),
+                            gh.getUserId(),
+                            gh.getScore(),
                             playedAt,
                             playlistId
                     );
@@ -311,15 +313,15 @@ public class GameService {
     public List<GameResultDTO> getUserGameResults(Long authUserId, Long userId) {
         Long effectiveUserId = (userId != null) ? userId : authUserId;
 
-        return gameHistoryRepository.findByIdUserId(effectiveUserId).stream()
+        return gameHistoryRepository.findByUserId(effectiveUserId).stream()
                 .map(gh -> {
                     Game g = gh.getGame();
                     Long playlistId = (g != null) ? g.getPlaylistId() : null;
-                    OffsetDateTime playedAt = (g != null) ? g.getPlayedAt() : null;
+                    OffsetDateTime playedAt = (g != null) ? g.getCreatedAt() : null;
                     return new GameResultDTO(
-                            gh.getId().getGameId(),
-                            gh.getId().getUserId(),
-                            gh.getUserScore(),
+                            gh.getGameId(),
+                            gh.getUserId(),
+                            gh.getScore(),
                             playedAt,
                             playlistId
                     );
@@ -340,13 +342,13 @@ public class GameService {
     }
 
     private boolean isCompleted(Long authUserId, Long gameId) {
-        return gameHistoryRepository.existsById(new GameHistoryId(gameId, authUserId));
+        return gameHistoryRepository.existsByGameIdAndUserId(gameId, authUserId);
     }
 
     private GameDTO mapGameForList(Long authUserId, Game g) {
-        if (gameHistoryRepository.existsById(new GameHistoryId(g.getId(), authUserId))) {
-            int score = gameHistoryRepository.findById(new GameHistoryId(g.getId(), authUserId))
-                    .map(GameHistory::getUserScore)
+        if (gameHistoryRepository.existsByGameIdAndUserId(g.getId(), authUserId)) {
+            int score = gameHistoryRepository.findByGameIdAndUserId(g.getId(), authUserId)
+                    .map(GameHistory::getScore)
                     .orElse(0);
             return mapGameDTO(g, "completed", score, null);
         }
@@ -362,7 +364,7 @@ public class GameService {
                 game.getPlaylistId(),
                 totalScore,
                 startedAt,
-                game.getPlayedAt()
+                game.getCreatedAt()
         );
     }
 

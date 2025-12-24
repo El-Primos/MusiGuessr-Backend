@@ -8,7 +8,7 @@ BEGIN
     -- Check whether the playlist is referenced by any active tournament
     IF EXISTS (
         SELECT 1
-        FROM tournaments t
+        FROM musiguessr_schema.tournaments t
         WHERE t.playlist_id = OLD.id
           AND t.state IN ('UPCOMING', 'ACTIVE')
     ) THEN
@@ -28,8 +28,10 @@ $$ LANGUAGE plpgsql;
 -- ============================================================
 -- Trigger that runs before deleting a playlist
 -- ============================================================
+DROP TRIGGER IF EXISTS trg_prevent_playlist_delete ON playlists;
+
 CREATE TRIGGER trg_prevent_playlist_delete
-    BEFORE DELETE ON playlists
+    BEFORE DELETE ON musiguessr_schema.playlists
     FOR EACH ROW
     EXECUTE FUNCTION prevent_playlist_delete_if_active_tournament();
 

@@ -32,12 +32,9 @@ public class Game {
     private Playlist playlist;
 
     @Column(nullable = false)
-    private Integer score;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GameState state = GameState.CREATED;
 
-    @Column(name = "played_at", nullable = false, insertable = false)
-    private OffsetDateTime playedAt;
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
+    private OffsetDateTime createdAt;
 }
