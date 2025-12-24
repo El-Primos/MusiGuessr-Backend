@@ -2,9 +2,8 @@ package com.musiguessr.backend.controller;
 
 import com.musiguessr.backend.dto.tournament.*;
 import com.musiguessr.backend.model.TournamentState;
-import com.musiguessr.backend.model.User;
-import com.musiguessr.backend.repository.UserRepository;
 import com.musiguessr.backend.service.TournamentService;
+import com.musiguessr.backend.util.AuthUtil;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/tournaments")
@@ -26,7 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class TournamentController {
 
     private final TournamentService tournamentService;
-    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<Page<TournamentResponseDTO>> getTournaments(
@@ -52,7 +49,7 @@ public class TournamentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody TournamentCreateRequestDTO request
     ) {
-        Long userId = getUserIdFromUserDetails(userDetails);
+        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(tournamentService.createTournament(userId, request));
     }
@@ -62,7 +59,7 @@ public class TournamentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
-        Long userId = getUserIdFromUserDetails(userDetails);
+        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
         return ResponseEntity.ok(tournamentService.joinTournament(userId, id));
     }
 
@@ -71,7 +68,7 @@ public class TournamentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
-        Long userId = getUserIdFromUserDetails(userDetails);
+        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
         return ResponseEntity.ok(tournamentService.leaveTournament(userId, id));
     }
 
@@ -92,14 +89,4 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.getLeaderboard(id));
     }
 
-    // ---------------- helper ----------------
-
-    private Long getUserIdFromUserDetails(UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
-        }
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-        return user.getId();
-    }
 }

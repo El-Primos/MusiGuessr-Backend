@@ -23,6 +23,7 @@ public class TournamentService {
     private final TournamentParticipantRepository participantRepository;
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
+    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional
     public TournamentResponseDTO createTournament(Long creatorId, TournamentCreateRequestDTO request) {

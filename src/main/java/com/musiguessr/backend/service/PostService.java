@@ -11,6 +11,7 @@ import com.musiguessr.backend.repository.GameHistoryRepository;
 import com.musiguessr.backend.repository.GameRepository;
 import com.musiguessr.backend.repository.GameRoundRepository;
 import com.musiguessr.backend.repository.PostRepository;
+import com.musiguessr.backend.repository.UserRepository;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ public class PostService {
     private final GameHistoryRepository gameHistoryRepository;
     private final GameRoundRepository gameRoundRepository;
     private final GameRepository gameRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public PostShareResponseDTO shareGameHistory(Long authUserId, PostShareRequestDTO request) {
@@ -84,6 +86,10 @@ public class PostService {
         }
 
         postRepository.delete(post);
+    }
+
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 
     // ------------- helpers -------------
