@@ -24,11 +24,11 @@ public class Tournament {
     @JoinColumn(name = "owner_id", insertable = false, updatable = false)
     private User owner;
 
-    @Column(name = "playlist_id", insertable = false, updatable = false)
+    @Column(name = "playlist_id")
     private Long playlistId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playlist_id")
+    @JoinColumn(name = "playlist_id", insertable = false, updatable = false)
     private Playlist playlist;
 
     @Column(nullable = false)

@@ -19,22 +19,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
         String getEmail();
         Integer getTotalScore();
         Long getGamesPlayed();
-        java.time.OffsetDateTime getLastPlayedAt();
+        java.time.Instant getLastPlayedAt();
     }
 
     interface GameHistoryProjection {
         Long getGameId();
         Long getPlaylistId();
         Integer getTotalScore();
-        java.time.OffsetDateTime getPlayedAt();
+        java.time.Instant getPlayedAt();
     }
 
     interface TournamentHistoryProjection {
         Long getTournamentId();
         Integer getUserScore();
         String getStatus();
-        java.time.OffsetDateTime getStartsAt();
-        java.time.OffsetDateTime getEndsAt();
+        java.time.Instant getStartsAt();
+        java.time.Instant getEndsAt();
     }
 
     @Query(value = """
