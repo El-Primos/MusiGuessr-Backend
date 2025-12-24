@@ -10,48 +10,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "games", schema = "musiguessr_schema")
+@Table(name = "games")
 public class Game {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "games_id_seq_gen")
-    @SequenceGenerator(
-            name = "games_id_seq_gen",
-            sequenceName = "musiguessr_schema.games_id_seq",
-            allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "creator_id", nullable = false)
-    private Long creatorId;
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "creator_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "games_creator_id_fkey")
-    )
-    private User creator;
-
-    @Column(name = "is_offline", nullable = false)
-    private Boolean isOffline = false;
-
-    @Column
-    private String type;
-
-    @Column(name = "played_at", nullable = false, insertable = false)
-    private OffsetDateTime playedAt;
+    @JoinColumn(name = "owner_id", nullable = false, insertable = false, updatable = false)
+    private User owner;
 
     @Column(name = "playlist_id")
     private Long playlistId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "playlist_id",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(name = "games_playlist_id_fkey")
-    )
+    @JoinColumn(name = "playlist_id", insertable = false, updatable = false)
     private Playlist playlist;
+
+    @Column(nullable = false)
+    private Integer score;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GameState state = GameState.CREATED;
+
+    @Column(name = "played_at", nullable = false, insertable = false)
+    private OffsetDateTime playedAt;
 }

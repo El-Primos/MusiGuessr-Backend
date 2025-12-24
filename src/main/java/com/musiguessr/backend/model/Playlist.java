@@ -1,7 +1,6 @@
 package com.musiguessr.backend.model;
 
 import jakarta.persistence.*;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "playlists", schema = "musiguessr_schema")
+@Table(name = "playlists")
 public class Playlist {
 
     @Id
@@ -20,9 +19,10 @@ public class Playlist {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "owner_id")
+    private Long ownerId;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", insertable = false, updatable = false)
+    private User owner;
 }

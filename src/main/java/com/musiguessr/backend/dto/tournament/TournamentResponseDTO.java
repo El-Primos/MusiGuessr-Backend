@@ -1,6 +1,6 @@
 package com.musiguessr.backend.dto.tournament;
 
-import com.musiguessr.backend.model.TournamentStatus;
+import com.musiguessr.backend.model.TournamentState;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class TournamentResponseDTO {
     private Long playlistId;
     private Long creatorId;
     private String creatorUsername;
-    private TournamentStatus status;
+    private TournamentState status;
     private OffsetDateTime createDate;
     private OffsetDateTime startDate;
     private OffsetDateTime endDate;

@@ -50,11 +50,11 @@ public class TournamentService {
         }
 
         Tournament tournament = new Tournament();
-        tournament.setCreatorId(creatorId);
+        tournament.setOwnerId(creatorId);
         tournament.setPlaylistId(request.getPlaylistId());
         tournament.setName(request.getName());
         tournament.setDescription(request.getDescription());
-        tournament.setStatus(TournamentStatus.UPCOMING);
+        tournament.setState(TournamentState.UPCOMING);
         tournament.setStartDate(request.getStartDate());
         tournament.setEndDate(request.getEndDate());
 
@@ -70,10 +70,10 @@ public class TournamentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<TournamentResponseDTO> getTournaments(TournamentStatus status, Pageable pageable) {
+    public Page<TournamentResponseDTO> getTournaments(TournamentState status, Pageable pageable) {
         Page<Tournament> tournaments;
         if (status != null) {
-            tournaments = tournamentRepository.findByStatus(status, pageable);
+            tournaments = tournamentRepository.findByState(status, pageable);
         } else {
             tournaments = tournamentRepository.findAll(pageable);
         }
@@ -89,7 +89,7 @@ public class TournamentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        if (tournament.getStatus() != TournamentStatus.UPCOMING && tournament.getStatus() != TournamentStatus.ACTIVE) {
+        if (tournament.getState() != TournamentState.UPCOMING && tournament.getState() != TournamentState.ACTIVE) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot join a finished tournament");
         }
 
@@ -113,11 +113,11 @@ public class TournamentService {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
 
-        if (tournament.getStatus() != TournamentStatus.UPCOMING) {
+        if (tournament.getState() != TournamentState.UPCOMING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Tournament is not in UPCOMING status");
         }
 
-        tournament.setStatus(TournamentStatus.ACTIVE);
+        tournament.setState(TournamentState.ACTIVE);
         tournament.setStartDate(OffsetDateTime.now());
 
         Tournament saved = tournamentRepository.save(tournament);
@@ -129,11 +129,11 @@ public class TournamentService {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
 
-        if (tournament.getStatus() != TournamentStatus.ACTIVE) {
+        if (tournament.getState() != TournamentState.ACTIVE) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Tournament is not in ACTIVE status");
         }
 
-        tournament.setStatus(TournamentStatus.FINISHED);
+        tournament.setState(TournamentState.FINISHED);
         tournament.setEndDate(OffsetDateTime.now());
 
         Tournament saved = tournamentRepository.save(tournament);
@@ -187,10 +187,10 @@ public class TournamentService {
     // ---------------- helpers ----------------
 
     private TournamentResponseDTO mapToResponseDTO(Tournament tournament) {
-        User creator = tournament.getCreator();
+        User creator = tournament.getOwner();
         String creatorUsername = null;
-        if (creator == null && tournament.getCreatorId() != null) {
-            creator = userRepository.findById(tournament.getCreatorId()).orElse(null);
+        if (creator == null && tournament.getOwnerId() != null) {
+            creator = userRepository.findById(tournament.getOwnerId()).orElse(null);
         }
         if (creator != null) {
             creatorUsername = creator.getUsername();
@@ -203,10 +203,10 @@ public class TournamentService {
                 tournament.getName(),
                 tournament.getDescription(),
                 tournament.getPlaylistId(),
-                tournament.getCreatorId(),
+                tournament.getOwnerId(),
                 creatorUsername,
-                tournament.getStatus(),
-                tournament.getCreateDate(),
+                tournament.getState(),
+                tournament.getCreatedAt(),
                 tournament.getStartDate(),
                 tournament.getEndDate(),
                 participantCount

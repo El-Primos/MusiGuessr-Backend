@@ -1,7 +1,7 @@
 package com.musiguessr.backend.model;
 
-public enum TournamentStatus {
-    UPCOMING,
+public enum GameState {
+    CREATED,
     ACTIVE,
     FINISHED
 }

@@ -13,13 +13,11 @@ public class PlaylistResponseDTO {
     private Long id;
     private String name;
     private Long ownerId;
-    private OffsetDateTime createdAt;
 
-    public PlaylistResponseDTO(Long id, String name, Long ownerId, OffsetDateTime createdAt) {
+    public PlaylistResponseDTO(Long id, String name, Long ownerId) {
         this.message = null;
         this.id = id;
         this.name = name;
         this.ownerId = ownerId;
-        this.createdAt = createdAt;
     }
 }
