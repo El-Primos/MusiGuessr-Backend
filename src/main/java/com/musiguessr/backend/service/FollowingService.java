@@ -123,6 +123,37 @@ public class FollowingService {
         return new java.util.ArrayList<>(dedup.values());
     }
 
+    @Transactional
+    public void unfriend(Long userId, Long friendId) {
+        ensureUserExists(userId);
+        ensureUserExists(friendId);
+
+        // Check both directions since friendship can be established either way
+        FollowingId idOutgoing = new FollowingId(userId, friendId);
+        FollowingId idIncoming = new FollowingId(friendId, userId);
+
+        Optional<Following> outgoing = followingRepository.findById(idOutgoing);
+        Optional<Following> incoming = followingRepository.findById(idIncoming);
+
+        // Find the accepted friendship
+        Following friendship = null;
+        FollowingId friendshipId = null;
+
+        if (outgoing.isPresent() && Boolean.TRUE.equals(outgoing.get().getAccepted())) {
+            friendship = outgoing.get();
+            friendshipId = idOutgoing;
+        } else if (incoming.isPresent() && Boolean.TRUE.equals(incoming.get().getAccepted())) {
+            friendship = incoming.get();
+            friendshipId = idIncoming;
+        }
+
+        if (friendship == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Friendship not found");
+        }
+
+        followingRepository.deleteById(friendshipId);
+    }
+
     private void validateUsers(Long requesterId, Long targetId) {
         ensureUserExists(requesterId);
         ensureUserExists(targetId);

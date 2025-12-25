@@ -58,4 +58,11 @@ public class FollowingController {
         Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(followingService.listAcceptedFollowing(userId));
     }
+
+    @DeleteMapping("/unfriend")
+    public ResponseEntity<String> unfriend(@RequestParam Long friendId) {
+        Long userId = authUtil.getCurrentUserId();
+        followingService.unfriend(userId, friendId);
+        return ResponseEntity.ok("Friendship removed");
+    }
 }
