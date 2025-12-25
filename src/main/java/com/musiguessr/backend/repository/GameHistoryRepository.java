@@ -30,7 +30,7 @@ public interface GameHistoryRepository extends JpaRepository<GameHistory, Long> 
         SELECT gh.userId, MAX(gh.score) as maxScore
         FROM GameHistory gh
         JOIN gh.game g
-        WHERE gh.playedAt >= :since
+        WHERE g.createdAt >= :since
         GROUP BY gh.userId
         ORDER BY maxScore DESC
         """)
