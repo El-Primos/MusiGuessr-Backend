@@ -3,6 +3,7 @@ package com.musiguessr.backend.repository;
 import com.musiguessr.backend.model.User;
 import java.util.Optional;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -82,4 +83,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
             ORDER BY t.start_date DESC NULLS LAST
             """, nativeQuery = true)
     List<TournamentHistoryProjection> findTournamentHistoryByUserId(@Param("userId") Long userId);
+
+    // Global leaderboard - Users sorted by total score
+    @Query("""
+        SELECT u.id, u.score
+        FROM User u
+        ORDER BY u.score DESC
+        """)
+    List<Object[]> findGlobalLeaderboard(Pageable pageable);
+
+    // Friends leaderboard - Users sorted by total score for a list of user IDs
+    @Query("""
+        SELECT u.id, u.score
+        FROM User u
+        WHERE u.id IN :userIds
+        ORDER BY u.score DESC
+        """)
+    List<Object[]> findFriendsLeaderboard(@Param("userIds") List<Long> userIds, Pageable pageable);
 }

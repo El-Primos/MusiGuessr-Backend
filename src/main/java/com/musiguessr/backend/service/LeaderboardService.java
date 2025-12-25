@@ -3,12 +3,10 @@ package com.musiguessr.backend.service;
 import com.musiguessr.backend.dto.leaderboard.LeaderboardEntryDTO;
 import com.musiguessr.backend.model.TournamentParticipant;
 import com.musiguessr.backend.model.User;
-import com.musiguessr.backend.repository.GameHistoryRepository;
 import com.musiguessr.backend.repository.PlaylistRepository;
 import com.musiguessr.backend.repository.TournamentParticipantRepository;
 import com.musiguessr.backend.repository.TournamentRepository;
 import com.musiguessr.backend.repository.UserRepository;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -24,40 +22,27 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class LeaderboardService {
 
-    private final GameHistoryRepository gameHistoryRepository;
     private final TournamentParticipantRepository tournamentParticipantRepository;
     private final TournamentRepository tournamentRepository;
     private final PlaylistRepository playlistRepository;
     private final UserRepository userRepository;
+    private final com.musiguessr.backend.repository.FollowingRepository followingRepository;
 
     @Transactional(readOnly = true)
-    public List<LeaderboardEntryDTO> getGlobalLeaderboard(String period, int limit) {
-        Pageable pageable = PageRequest.of(0, limit);
-        List<Object[]> results;
-
-        switch (period.toLowerCase()) {
-            case "weekly" -> {
-                OffsetDateTime since = OffsetDateTime.now().minusDays(7);
-                results = gameHistoryRepository.findGlobalLeaderboardSince(since, pageable);
-            }
-            case "monthly" -> {
-                OffsetDateTime since = OffsetDateTime.now().minusDays(30);
-                results = gameHistoryRepository.findGlobalLeaderboardSince(since, pageable);
-            }
-            default -> results = gameHistoryRepository.findGlobalLeaderboard(pageable);
-        }
-
+    public List<LeaderboardEntryDTO> getGlobalLeaderboard() {
+        Pageable pageable = PageRequest.of(0, 100);
+        List<Object[]> results = userRepository.findGlobalLeaderboard(pageable);
         return mapToLeaderboard(results);
     }
 
     @Transactional(readOnly = true)
-    public List<LeaderboardEntryDTO> getPlaylistLeaderboard(Long playlistId, int limit) {
+    public List<LeaderboardEntryDTO> getPlaylistLeaderboard(Long playlistId) {
         if (!playlistRepository.existsById(playlistId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found");
         }
 
-        Pageable pageable = PageRequest.of(0, limit);
-        List<Object[]> results = gameHistoryRepository.findPlaylistLeaderboard(playlistId, pageable);
+        Pageable pageable = PageRequest.of(0, 100);
+        List<Object[]> results = userRepository.findGlobalLeaderboard(pageable);
 
         return mapToLeaderboard(results);
     }
@@ -82,6 +67,49 @@ public class LeaderboardService {
                             p.getUserScore()
                     );
                 })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<LeaderboardEntryDTO> getFriendsLeaderboard(Long userId) {
+        // Verify user exists
+        if (!userRepository.existsById(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+
+        // Get mutual friends: users who follow current user AND current user follows them (both accepted)
+        List<Long> friendIds = getMutualFriendIds(userId);
+
+        // Include the current user in the leaderboard
+        friendIds.add(userId);
+
+        // If no friends (only current user), still show them
+        if (friendIds.isEmpty()) {
+            friendIds.add(userId);
+        }
+
+        Pageable pageable = PageRequest.of(0, 100);
+        List<Object[]> results = userRepository.findFriendsLeaderboard(friendIds, pageable);
+
+        return mapToLeaderboard(results);
+    }
+
+    private List<Long> getMutualFriendIds(Long userId) {
+        // Get users that current user follows (and accepted)
+        List<Long> following = followingRepository.findByIdUserIdAndAcceptedTrue(userId)
+                .stream()
+                .map(f -> f.getId().getFollowingId())
+                .collect(Collectors.toList());
+
+        // Get users that follow current user (and accepted)
+        List<Long> followers = followingRepository.findByIdFollowingIdAndAcceptedTrue(userId)
+                .stream()
+                .map(f -> f.getId().getUserId())
+                .collect(Collectors.toList());
+
+        // Find mutual friends (intersection of following and followers)
+        return following.stream()
+                .filter(followers::contains)
                 .collect(Collectors.toList());
     }
 
