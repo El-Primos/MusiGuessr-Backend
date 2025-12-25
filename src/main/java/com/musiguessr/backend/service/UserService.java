@@ -65,7 +65,7 @@ public class UserService {
     public List<GameHistoryDTO> getGameHistory(Long userId) {
         return userRepository.findGameHistoryByUserId(userId).stream()
                 .map(p -> new GameHistoryDTO(
-                        p.getGameId(),
+                        p.getGameHistoryId(),
                         p.getPlaylistId(),
                         p.getTotalScore(),
                         p.getPlayedAt() != null

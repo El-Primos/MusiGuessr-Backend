@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     }
 
     interface GameHistoryProjection {
-        Long getGameId();
+        Long getGameHistoryId();
         Long getPlaylistId();
         Integer getTotalScore();
         java.time.Instant getPlayedAt();
@@ -58,7 +58,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = """
             SELECT
-                gh.game_id AS gameId,
+                gh.id AS gameHistoryId,
                 g.playlist_id AS playlistId,
                 gh.score AS totalScore,
                 g.created_at AS playedAt

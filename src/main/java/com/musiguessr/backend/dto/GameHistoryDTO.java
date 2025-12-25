@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameHistoryDTO {
-    private Long gameId;
+    private Long gameHistoryId;
     private Long playlistId;
     private Integer totalScore;
     private OffsetDateTime playedAt;
