@@ -5,7 +5,6 @@ import com.musiguessr.backend.model.TournamentState;
 import com.musiguessr.backend.service.TournamentService;
 import com.musiguessr.backend.util.AuthUtil;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +17,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tournaments")
 @RequiredArgsConstructor
 public class TournamentController {
 
     private final TournamentService tournamentService;
+    private final AuthUtil authUtil;
 
     @GetMapping
     public ResponseEntity<Page<TournamentResponseDTO>> getTournaments(
@@ -45,11 +47,8 @@ public class TournamentController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TournamentResponseDTO> createTournament(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody TournamentCreateRequestDTO request
-    ) {
-        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+    public ResponseEntity<TournamentResponseDTO> createTournament(@Valid @RequestBody TournamentCreateRequestDTO request) {
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(tournamentService.createTournament(userId, request));
     }
@@ -57,31 +56,26 @@ public class TournamentController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TournamentResponseDTO> updateTournament(
-            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
             @RequestBody TournamentUpdateRequestDTO request
     ) {
-        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(tournamentService.updateTournament(id, userId, request));
     }
 
     @PatchMapping("/{id}/state")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TournamentResponseDTO> updateTournamentState(
-            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id,
             @RequestBody TournamentStateUpdateRequestDTO request
     ) {
-        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(tournamentService.updateTournamentState(id, userId, request.getState()));
     }
 
     @PostMapping("/{id}/join")
-    public ResponseEntity<TournamentResponseDTO> joinTournament(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long id
-    ) {
-        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+    public ResponseEntity<TournamentResponseDTO> joinTournament(@PathVariable Long id) {
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(tournamentService.joinTournament(userId, id));
     }
 
@@ -90,7 +84,7 @@ public class TournamentController {
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long id
     ) {
-        Long userId = AuthUtil.requireUserId(userDetails, tournamentService.getUserRepository());
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(tournamentService.leaveTournament(userId, id));
     }
 

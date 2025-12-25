@@ -5,13 +5,12 @@ import com.musiguessr.backend.dto.post.PostShareResponseDTO;
 import com.musiguessr.backend.service.PostService;
 import com.musiguessr.backend.util.AuthUtil;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -19,13 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final AuthUtil authUtil;
 
     @PostMapping
-    public ResponseEntity<PostShareResponseDTO> shareGameHistory(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody PostShareRequestDTO request
-    ) {
-        Long userId = AuthUtil.requireUserId(userDetails, postService.getUserRepository());
+    public ResponseEntity<PostShareResponseDTO> shareGameHistory(@Valid @RequestBody PostShareRequestDTO request) {
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(postService.shareGameHistory(userId, request));
     }
@@ -41,17 +38,14 @@ public class PostController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<PostShareResponseDTO>> getMyPosts(@AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = AuthUtil.requireUserId(userDetails, postService.getUserRepository());
+    public ResponseEntity<List<PostShareResponseDTO>> getMyPosts() {
+        Long userId = authUtil.getCurrentUserId();
         return ResponseEntity.ok(postService.getUserPosts(userId));
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long postId
-    ) {
-        Long userId = AuthUtil.requireUserId(userDetails, postService.getUserRepository());
+    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+        Long userId = authUtil.getCurrentUserId();
         postService.deletePost(userId, postId);
         return ResponseEntity.ok("Post deleted successfully");
     }
