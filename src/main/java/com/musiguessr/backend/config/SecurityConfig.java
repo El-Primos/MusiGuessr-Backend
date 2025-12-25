@@ -58,7 +58,10 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .requestMatchers("/api/games/**").permitAll()
+                        // Tournament games require authentication
+                        .requestMatchers("/api/games/tournament").authenticated()
+                        // Regular games are public (for non-logged-in users)
+                        .requestMatchers("/api/games", "/api/games/*/start", "/api/games/*/guess", "/api/games/*/skip", "/api/games/*/finish").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
                 )
