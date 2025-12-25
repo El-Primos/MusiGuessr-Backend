@@ -96,7 +96,8 @@ public class UserService {
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getScore()
+                user.getScore(),
+                user.getRole().name()
         );
     }
 }
