@@ -31,7 +31,6 @@ public class MusicController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<MusicResponseDTO>> getMusics(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long artistId,
