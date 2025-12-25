@@ -32,6 +32,13 @@ public class Game {
     @JoinColumn(name = "playlist_id", insertable = false, updatable = false)
     private Playlist playlist;
 
+    @Column(name = "tournament_id")
+    private Long tournamentId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tournament_id", insertable = false, updatable = false)
+    private Tournament tournament;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private GameState state = GameState.CREATED;

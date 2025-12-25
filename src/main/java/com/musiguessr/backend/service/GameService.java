@@ -31,6 +31,8 @@ public class GameService {
     private final UserRepository userRepository;
 
     private final PlaylistService playlistService;
+    private final TournamentRepository tournamentRepository;
+    private final TournamentParticipantRepository tournamentParticipantRepository;
 
     @Transactional
     public GameResponseDTO createGame() {
@@ -47,6 +49,42 @@ public class GameService {
         if (saved.getPlaylistId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Game has no playlist");
         }
+
+        long totalRounds = playlistItemRepository.countByIdPlaylistId(saved.getPlaylistId());
+
+        return new GameResponseDTO(saved.getId(), saved.getState().name(), saved.getPlaylistId(), totalRounds);
+    }
+
+    @Transactional
+    public GameResponseDTO createTournamentGame(Long tournamentId, Long playlistId) {
+        // Validate tournament exists
+        if (!tournamentRepository.existsById(tournamentId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament not found");
+        }
+
+        // Validate playlist exists and has songs
+        long count = playlistItemRepository.countByIdPlaylistId(playlistId);
+        if (count == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Playlist is empty or does not exist");
+        }
+
+        // Validate user is registered for the tournament
+        Long userId = getUserId();
+        if (userId != null && userId != 0) {
+            TournamentParticipantId participantId = new TournamentParticipantId(tournamentId, userId);
+            if (!tournamentParticipantRepository.existsById(participantId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        "You must join the tournament before playing");
+            }
+        }
+
+        Game game = new Game();
+        game.setOwnerId(userId);
+        game.setState(GameState.CREATED);
+        game.setPlaylistId(playlistId);
+        game.setTournamentId(tournamentId);
+
+        Game saved = gameRepository.save(game);
 
         long totalRounds = playlistItemRepository.countByIdPlaylistId(saved.getPlaylistId());
 
@@ -124,6 +162,18 @@ public class GameService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
             user.setScore(user.getScore() + finalScore);
             userRepository.save(user);
+
+            // If this is a tournament game, update the tournament participant score
+            if (game.getTournamentId() != null) {
+                TournamentParticipantId participantId = new TournamentParticipantId(game.getTournamentId(), userId);
+                TournamentParticipant participant = tournamentParticipantRepository.findById(participantId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                                "You must join the tournament before playing"));
+                
+                // Update participant's tournament score with the game score
+                participant.setUserScore(participant.getUserScore() + finalScore);
+                tournamentParticipantRepository.save(participant);
+            }
         }
 
         game.setState(GameState.FINISHED);

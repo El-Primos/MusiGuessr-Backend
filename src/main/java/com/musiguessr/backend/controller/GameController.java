@@ -19,6 +19,14 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(gameService.createGame());
     }
 
+    @PostMapping("/api/games/tournament")
+    public ResponseEntity<GameResponseDTO> createTournamentGame(
+            @RequestParam Long tournamentId,
+            @RequestParam Long playlistId
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(gameService.createTournamentGame(tournamentId, playlistId));
+    }
+
     @PostMapping("/api/games/{id}/start")
     public ResponseEntity<GameStartDTO> startGame(@PathVariable Long id) {
         return ResponseEntity.ok(gameService.startGame(id));
