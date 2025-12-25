@@ -212,7 +212,14 @@ public class GameService {
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        return userDetails.getUser().getId();
+        User user = userDetails.user();
+
+        if (Objects.equals(user.getRole(), UserRole.BANNED)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Your account is disabled. Please contact support.");
+        }
+
+        return user.getId();
     }
 
     private Game ensureOwnedGame(Long id) {

@@ -1,20 +1,16 @@
 package com.musiguessr.backend.security;
 
 import com.musiguessr.backend.model.User;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.musiguessr.backend.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
-
-    @Getter
-    private final User user;
+public record CustomUserDetails(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -50,6 +46,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !Objects.equals(user.getRole(), UserRole.BANNED);
     }
 }
