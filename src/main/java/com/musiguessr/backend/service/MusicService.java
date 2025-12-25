@@ -10,6 +10,7 @@ import com.musiguessr.backend.repository.ArtistRepository;
 import com.musiguessr.backend.repository.GenreRepository;
 import com.musiguessr.backend.repository.MusicRepository;
 import com.musiguessr.backend.security.CustomUserDetails;
+import com.musiguessr.backend.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -39,6 +40,7 @@ public class MusicService {
     private final MusicRepository musicRepository;
     private final GenreRepository genreRepository;
     private final ArtistRepository artistRepository;
+    private final AuthUtil authUtil;
 
     public PresignResponseDTO presign(PresignRequestDTO request) {
         if (musicRepository.existsByName(request.getName())) {
@@ -78,7 +80,7 @@ public class MusicService {
         String url = s3Service.getUrl(request.getKey());
 
         Music music = new Music();
-        music.setOwnerId(getUserId());
+        music.setOwnerId(authUtil.getCurrentUserId());
         music.setName(request.getName());
         music.setUrl(url);
 
@@ -177,20 +179,5 @@ public class MusicService {
                 genreDTO,
                 artistDTO
         );
-    }
-
-    private static Long getUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean isRegistered =
-                auth != null &&
-                        auth.isAuthenticated() &&
-                        !(auth instanceof AnonymousAuthenticationToken);
-
-        if (!isRegistered) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-        return userDetails.getUser().getId();
     }
 }

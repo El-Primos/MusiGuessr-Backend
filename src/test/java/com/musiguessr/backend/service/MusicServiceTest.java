@@ -4,9 +4,11 @@ import com.musiguessr.backend.dto.music.*;
 import com.musiguessr.backend.model.Artist;
 import com.musiguessr.backend.model.Genre;
 import com.musiguessr.backend.model.Music;
+import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.ArtistRepository;
 import com.musiguessr.backend.repository.GenreRepository;
 import com.musiguessr.backend.repository.MusicRepository;
+import com.musiguessr.backend.util.AuthUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +34,8 @@ class MusicServiceTest {
     private GenreRepository genreRepository;
     @Mock
     private ArtistRepository artistRepository;
+    @Mock
+    private AuthUtil authUtil;
 
     @InjectMocks
     private MusicService musicService;
@@ -91,6 +95,8 @@ class MusicServiceTest {
         request.setName("New Song");
         request.setGenreId(1L);
         request.setArtistId(2L);
+
+        when(authUtil.getCurrentUserId()).thenReturn(99L);
 
         when(s3Service.doesFileExist(request.getKey())).thenReturn(true);
         when(s3Service.getUrl(request.getKey())).thenReturn("http://full-url.com");

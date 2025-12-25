@@ -6,9 +6,9 @@ import com.musiguessr.backend.model.Following;
 import com.musiguessr.backend.model.FollowingId;
 import com.musiguessr.backend.repository.FollowingRepository;
 import com.musiguessr.backend.repository.UserRepository;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,6 @@ public class FollowingService {
 
     private final FollowingRepository followingRepository;
     private final UserRepository userRepository;
-    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional
     public void sendFollowRequest(Long requesterId, Long targetId) {
@@ -97,7 +96,8 @@ public class FollowingService {
     @Transactional(readOnly = true)
     public List<FollowRequestDTO> listIncomingRequests(Long userId) {
         ensureUserExists(userId);
-        return followingRepository.findByIdFollowingIdAndAcceptedFalse(userId).stream()
+        return followingRepository.findByIdFollowingIdAndAcceptedFalse(userId)
+                .stream()
                 .map(this::mapToRequestDTO)
                 .toList();
     }
@@ -105,15 +105,17 @@ public class FollowingService {
     @Transactional(readOnly = true)
     public List<FollowFriendDTO> listAcceptedFollowing(Long userId) {
         ensureUserExists(userId);
-        List<FollowFriendDTO> outgoing = followingRepository.findByIdUserIdAndAcceptedTrue(userId).stream()
+        List<FollowFriendDTO> outgoing = followingRepository.findByIdUserIdAndAcceptedTrue(userId)
+                .stream()
                 .map(this::mapToFriendDTOOutgoing)
                 .toList();
 
-        List<FollowFriendDTO> incoming = followingRepository.findByIdFollowingIdAndAcceptedTrue(userId).stream()
+        List<FollowFriendDTO> incoming = followingRepository.findByIdFollowingIdAndAcceptedTrue(userId)
+                .stream()
                 .map(this::mapToFriendDTOIncoming)
                 .toList();
 
-        java.util.Map<Long, FollowFriendDTO> dedup = new java.util.LinkedHashMap<>();
+        Map<Long, FollowFriendDTO> dedup = new LinkedHashMap<>();
         java.util.stream.Stream.concat(outgoing.stream(), incoming.stream())
                 .filter(dto -> dto.getUserId() != null)
                 .forEach(dto -> dedup.put(dto.getUserId(), dto));
