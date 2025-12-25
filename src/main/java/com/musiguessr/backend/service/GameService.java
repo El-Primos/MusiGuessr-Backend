@@ -56,10 +56,15 @@ public class GameService {
     }
 
     @Transactional
-    public GameResponseDTO createTournamentGame(Long tournamentId, Long playlistId) {
-        // Validate tournament exists
-        if (!tournamentRepository.existsById(tournamentId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament not found");
+    public GameResponseDTO createTournamentGame(Long tournamentId) {
+        // Fetch tournament and validate it exists
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tournament not found"));
+
+        // Get playlist from tournament
+        Long playlistId = tournament.getPlaylistId();
+        if (playlistId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tournament has no playlist");
         }
 
         // Validate playlist exists and has songs

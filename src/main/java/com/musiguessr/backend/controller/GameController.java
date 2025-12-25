@@ -21,10 +21,9 @@ public class GameController {
 
     @PostMapping("/api/games/tournament")
     public ResponseEntity<GameResponseDTO> createTournamentGame(
-            @RequestParam Long tournamentId,
-            @RequestParam Long playlistId
+            @RequestParam Long tournamentId
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(gameService.createTournamentGame(tournamentId, playlistId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(gameService.createTournamentGame(tournamentId));
     }
 
     @PostMapping("/api/games/{id}/start")
