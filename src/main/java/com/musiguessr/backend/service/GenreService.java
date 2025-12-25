@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,7 +26,10 @@ public class GenreService {
     public List<GenreResponseDTO> getGenres(String name, Integer limit, Integer offset) {
         Stream<Genre> stream = genreRepository.findAll().stream();
 
-        if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
+        if (name != null) {
+            String needle = name.trim().toLowerCase();
+            stream = stream.filter(p -> p.getName() != null && p.getName().toLowerCase().contains(needle));
+        }
 
         int safeOffset = (offset == null || offset < 0) ? 0 : offset;
         int safeLimit = (limit == null || limit < 0) ? 50 : limit;
