@@ -4,8 +4,10 @@ import com.musiguessr.backend.dto.GameHistoryDTO;
 import com.musiguessr.backend.dto.MeProfileDTO;
 import com.musiguessr.backend.dto.TournamentHistoryDTO;
 import com.musiguessr.backend.dto.UserResponseDTO;
+import com.musiguessr.backend.dto.user.UserUpdateRequestDTO;
 import com.musiguessr.backend.service.UserService;
 import com.musiguessr.backend.util.AuthUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,6 +39,12 @@ public class UserController {
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(Map.of("message", "User with id " + id + " deleted successfully"));
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<UserResponseDTO> updateCurrentUser(@Valid @RequestBody UserUpdateRequestDTO dto) {
+        Long userId = authUtil.getCurrentUserId();
+        return ResponseEntity.ok(userService.updateUser(userId, dto));
     }
 
     @GetMapping("/me/profile")
