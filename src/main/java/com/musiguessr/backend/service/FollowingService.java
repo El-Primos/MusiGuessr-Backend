@@ -79,6 +79,19 @@ public class FollowingService {
         f.setAccepted(true);
         f.setPending(true);
         followingRepository.save(f);
+
+        // ✅ Create reverse direction for mutual friendship
+        // This ensures getMutualFriendIds() can find mutual friends correctly
+        FollowingId reverseId = new FollowingId(userId, requesterId);
+        if (!followingRepository.existsById(reverseId)) {
+            Following reverse = new Following();
+            reverse.setId(reverseId);
+            reverse.setUser(userRepository.getReferenceById(userId));
+            reverse.setFollowing(userRepository.getReferenceById(requesterId));
+            reverse.setAccepted(true);
+            reverse.setPending(true);
+            followingRepository.save(reverse);
+        }
     }
 
     @Transactional
