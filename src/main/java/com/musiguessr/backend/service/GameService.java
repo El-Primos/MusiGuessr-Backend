@@ -81,6 +81,12 @@ public class GameService {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
                         "You must join the tournament before playing");
             }
+
+            // Check if user has already played this tournament
+            if (gameHistoryRepository.existsByTournamentIdAndUserId(tournamentId, userId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                        "You have already played this tournament");
+            }
         }
 
         Game game = new Game();
