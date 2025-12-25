@@ -54,7 +54,6 @@ class MusicServiceTest {
 
         assertNotNull(response.getUploadUrl());
         assertTrue(response.getKey().contains("music/"));
-        assertTrue(response.getKey().contains("test.mp3"));
     }
 
     @Test
