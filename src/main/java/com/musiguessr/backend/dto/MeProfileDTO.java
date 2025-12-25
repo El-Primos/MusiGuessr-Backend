@@ -17,4 +17,5 @@ public class MeProfileDTO {
     private Long gamesPlayed;
     private OffsetDateTime lastPlayedAt;
     private Long tournamentsAttended;
+    private String profilePictureUrl;
 }

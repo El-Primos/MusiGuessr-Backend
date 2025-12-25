@@ -55,6 +55,20 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userId, dto));
     }
 
+    @PostMapping("/me/profile-picture/presign")
+    public ResponseEntity<com.musiguessr.backend.dto.user.ProfilePicturePresignResponseDTO> presignProfilePicture(
+            @Valid @RequestBody com.musiguessr.backend.dto.user.ProfilePicturePresignRequestDTO dto) {
+        Long userId = authUtil.getCurrentUserId();
+        return ResponseEntity.ok(userService.presignProfilePicture(userId, dto.getFileName(), dto.getContentType()));
+    }
+
+    @PostMapping("/me/profile-picture/confirm")
+    public ResponseEntity<UserResponseDTO> confirmProfilePicture(
+            @Valid @RequestBody com.musiguessr.backend.dto.user.ProfilePictureConfirmRequestDTO dto) {
+        Long userId = authUtil.getCurrentUserId();
+        return ResponseEntity.ok(userService.confirmProfilePicture(userId, dto.getKey()));
+    }
+
     @GetMapping("/me/profile")
     public ResponseEntity<MeProfileDTO> getProfile() {
         Long userId = authUtil.getCurrentUserId();

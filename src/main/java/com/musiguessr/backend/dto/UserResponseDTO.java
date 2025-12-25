@@ -15,4 +15,5 @@ public class UserResponseDTO {
     private String email;
     private Integer totalScore;
     private String role;
+    private String profilePictureUrl;
 }

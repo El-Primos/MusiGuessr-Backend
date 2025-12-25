@@ -4,14 +4,18 @@ import com.musiguessr.backend.dto.UserResponseDTO;
 import com.musiguessr.backend.dto.MeProfileDTO;
 import com.musiguessr.backend.dto.GameHistoryDTO;
 import com.musiguessr.backend.dto.TournamentHistoryDTO;
+import com.musiguessr.backend.dto.user.ProfilePicturePresignResponseDTO;
 import com.musiguessr.backend.dto.user.UserUpdateRequestDTO;
 import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -19,7 +23,16 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public class UserService {
 
+    private static final Map<String, String> VALID_IMAGE_FORMATS = Map.of(
+            "jpg", "image/jpeg",
+            "jpeg", "image/jpeg",
+            "png", "image/png",
+            "gif", "image/gif",
+            "webp", "image/webp"
+    );
+
     private final UserRepository userRepository;
+    private final S3Service s3Service;
     public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
@@ -49,6 +62,53 @@ public class UserService {
 
         user.setRole(role);
         User savedUser = userRepository.save(user);
+        return toDto(savedUser);
+    }
+
+    public ProfilePicturePresignResponseDTO presignProfilePicture(Long userId, String fileName, String contentType) {
+        String extension = StringUtils.getFilenameExtension(fileName);
+        if (extension == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File must have an extension");
+        }
+
+        String normalizedExt = extension.toLowerCase();
+        if (!VALID_IMAGE_FORMATS.containsKey(normalizedExt)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Extension '." + normalizedExt + "' is not supported. Use jpg, png, gif, or webp");
+        }
+
+        String expectedType = VALID_IMAGE_FORMATS.get(normalizedExt);
+        if (!expectedType.equals(contentType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(
+                    "Expected '%s' for .%s extension, but got '%s'",
+                    expectedType, normalizedExt, contentType
+            ));
+        }
+
+        String uniqueKey = "profile-pictures/" + userId + "/" + UUID.randomUUID() + "." + normalizedExt;
+        String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, contentType);
+
+        return new ProfilePicturePresignResponseDTO("Presign upload url created", uniqueKey, uploadUrl);
+    }
+
+    @Transactional
+    public UserResponseDTO confirmProfilePicture(Long userId, String key) {
+        if (!s3Service.doesFileExist(key)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found in S3");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Delete old profile picture if exists
+        if (user.getProfilePictureUrl() != null && user.getProfilePictureUrl().contains("profile-pictures/")) {
+            String oldKey = user.getProfilePictureUrl().substring(user.getProfilePictureUrl().indexOf("profile-pictures/"));
+            s3Service.deleteFile(oldKey);
+        }
+
+        String url = s3Service.getUrl(key);
+        user.setProfilePictureUrl(url);
+        User savedUser = userRepository.save(user);
+
         return toDto(savedUser);
     }
 
@@ -82,7 +142,8 @@ public class UserService {
                 projection.getLastPlayedAt() != null
                         ? projection.getLastPlayedAt().atOffset(java.time.ZoneOffset.UTC)
                         : null,
-                projection.getTournamentsAttended()
+                projection.getTournamentsAttended(),
+                projection.getProfilePictureUrl()
         );
     }
 
@@ -122,7 +183,8 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getScore(),
-                user.getRole().name()
+                user.getRole().name(),
+                user.getProfilePictureUrl()
         );
     }
 }
