@@ -28,6 +28,7 @@ public class GameService {
     private final GameRoundRepository gameRoundRepository;
     private final PlaylistItemRepository playlistItemRepository;
     private final MusicRepository musicRepository;
+    private final UserRepository userRepository;
 
     private final PlaylistService playlistService;
     private final GameSessionStore sessionStore;
@@ -116,6 +117,15 @@ public class GameService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game History not found"));
 
         int finalScore = history.getScore();
+
+        // Add the earned score to the user's total score
+        Long userId = history.getUserId();
+        if (userId != null && userId != 0) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            user.setScore(user.getScore() + finalScore);
+            userRepository.save(user);
+        }
 
         game.setState(GameState.FINISHED);
         gameRepository.save(game);
