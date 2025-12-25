@@ -35,4 +35,7 @@ public class User {
 
     @Column(nullable = false)
     private Integer score = 0;
+
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
 }

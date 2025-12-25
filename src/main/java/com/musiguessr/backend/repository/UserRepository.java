@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         Long getGamesPlayed();
         java.time.Instant getLastPlayedAt();
         Long getTournamentsAttended();
+        String getProfilePictureUrl();
     }
 
     interface GameHistoryProjection {
@@ -51,7 +52,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
                  FROM musiguessr_schema.games g
                  JOIN musiguessr_schema.game_history gh2 ON gh2.game_id = g.id
                  WHERE gh2.user_id = u.id) AS lastPlayedAt,
-                COALESCE((SELECT COUNT(*) FROM musiguessr_schema.tournament_info ti WHERE ti.user_id = u.id), 0) AS tournamentsAttended
+                COALESCE((SELECT COUNT(*) FROM musiguessr_schema.tournament_info ti WHERE ti.user_id = u.id), 0) AS tournamentsAttended,
+                u.profile_picture_url AS profilePictureUrl
             FROM musiguessr_schema.users u
             WHERE u.id = :userId
             """, nativeQuery = true)
