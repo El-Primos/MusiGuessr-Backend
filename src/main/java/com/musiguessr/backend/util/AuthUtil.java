@@ -1,6 +1,7 @@
 package com.musiguessr.backend.util;
 
 import com.musiguessr.backend.model.User;
+import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +25,20 @@ public class AuthUtil {
     }
 
     public User getCurrentUser() {
+        String username = getString();
+
+        User user =  userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (Objects.equals(user.getRole(), UserRole.BANNED)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Your account is disabled. Please contact support.");
+        }
+
+        return user;
+    }
+
+    private static String getString() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated() || (auth instanceof AnonymousAuthenticationToken)) {
@@ -36,8 +53,6 @@ public class AuthUtil {
         } else {
             username = principal.toString();
         }
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return username;
     }
 }

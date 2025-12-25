@@ -351,7 +351,12 @@ public class PlaylistService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-            User user = userDetails.getUser();
+            User user = userDetails.user();
+
+            if (Objects.equals(user.getRole(), UserRole.BANNED)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Your account is disabled. Please contact support.");
+            }
 
             if (user.getRole() == UserRole.ADMIN) {
                 ownerId = user.getId();

@@ -5,8 +5,8 @@ import com.musiguessr.backend.dto.auth.LoginRequestDTO;
 import com.musiguessr.backend.dto.auth.LogoutRequestDTO;
 import com.musiguessr.backend.dto.auth.RegisterRequestDTO;
 import com.musiguessr.backend.model.RefreshToken;
-import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.model.User;
+import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.repository.RefreshTokenRepository;
 import com.musiguessr.backend.repository.UserRepository;
 import com.musiguessr.backend.security.CustomUserDetails;
@@ -14,6 +14,8 @@ import com.musiguessr.backend.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,12 +75,23 @@ public class AuthService {
                             request.getPassword()
                     )
             );
-        } catch (Exception e) {
+        } catch (DisabledException e) {
+
+            User user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+            }
+
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Your account is disabled. Please contact support.");
+
+        } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = userDetails.getUser();
+        User user = userDetails.user();
 
         String token = jwtUtil.generateJwtToken(user.getUsername());
         RefreshToken refreshToken = refreshTokenService.generateRefreshToken(user.getId());
@@ -96,6 +109,6 @@ public class AuthService {
 
     @Transactional
     public void logout(LogoutRequestDTO request) {
-            refreshTokenRepository.deleteByToken(request.getRefreshToken());
+        refreshTokenRepository.deleteByToken(request.getRefreshToken());
     }
 }
