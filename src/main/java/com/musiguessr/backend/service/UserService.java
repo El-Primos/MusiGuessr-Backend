@@ -9,7 +9,6 @@ import com.musiguessr.backend.model.User;
 import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,7 +19,6 @@ import org.springframework.http.HttpStatus;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
@@ -37,28 +35,6 @@ public class UserService {
 
         if (dto.getName() != null) {
             user.setName(dto.getName());
-        }
-
-        if (dto.getUsername() != null && !dto.getUsername().equals(user.getUsername())) {
-            if (userRepository.existsByUsername(dto.getUsername())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-            }
-            user.setUsername(dto.getUsername());
-        }
-
-        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-            if (userRepository.existsByEmail(dto.getEmail())) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
-            }
-            user.setEmail(dto.getEmail());
-        }
-
-        if (dto.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-
-        if (dto.getRole() != null) {
-            user.setRole(dto.getRole());
         }
 
         User savedUser = userRepository.save(user);
