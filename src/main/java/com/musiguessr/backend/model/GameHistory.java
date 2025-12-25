@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.OffsetDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +25,7 @@ public class GameHistory {
     @JoinColumn(name = "game_id", insertable = false, updatable = false)
     private Game game;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id")
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,4 +34,7 @@ public class GameHistory {
 
     @Column(name = "score", nullable = false)
     private Integer score = 0;
+
+    @Column(name = "played_at", nullable = false)
+    private OffsetDateTime playedAt;
 }

@@ -1,6 +1,5 @@
 package com.musiguessr.backend.dto.game;
 
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,12 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameDTO {
+public class GameResponseDTO {
     private Long id;
-    private String status;
+    private String state;
     private Long playlistId;
-
-    private Integer totalScore;
-    private OffsetDateTime startedAt;
-    private OffsetDateTime playedAt;
+    private Long totalRounds;
 }

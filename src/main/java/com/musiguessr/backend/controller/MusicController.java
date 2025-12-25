@@ -31,6 +31,7 @@ public class MusicController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<MusicResponseDTO>> getMusics(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Long artistId,
@@ -41,6 +42,7 @@ public class MusicController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MusicResponseDTO> getMusicById(@PathVariable Long id) {
         return ResponseEntity.ok(musicService.getMusicById(id));
     }

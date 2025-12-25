@@ -1,25 +1,20 @@
 package com.musiguessr.backend.repository;
 
 import com.musiguessr.backend.model.GameHistory;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface GameHistoryRepository extends JpaRepository<GameHistory, Long> {
 
-    List<GameHistory> findByGameId(Long gameId);
-
-    List<GameHistory> findByUserId(Long userId);
-
-    boolean existsByGameIdAndUserId(Long gameId, Long userId);
-
-    Optional<GameHistory> findByGameIdAndUserId(Long gameId, Long userId);
+    Optional<GameHistory> findByGameId(Long gameId);
 
     // Global leaderboard - MAX score per user (all time)
     @Query("""
@@ -35,7 +30,7 @@ public interface GameHistoryRepository extends JpaRepository<GameHistory, Long> 
         SELECT gh.userId, MAX(gh.score) as maxScore
         FROM GameHistory gh
         JOIN gh.game g
-        WHERE g.createdAt >= :since
+        WHERE gh.playedAt >= :since
         GROUP BY gh.userId
         ORDER BY maxScore DESC
         """)
