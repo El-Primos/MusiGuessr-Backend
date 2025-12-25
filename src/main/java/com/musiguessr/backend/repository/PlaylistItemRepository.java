@@ -18,11 +18,14 @@ public interface PlaylistItemRepository extends JpaRepository<PlaylistItem, Play
 
     Optional<PlaylistItem> findByIdPlaylistIdAndMusicId(Long playlistId, Long musicId);
 
-    Integer findMaxPositionByIdPlaylistId(Long playlistId);
+    @Query("SELECT MAX(pi.id.position) FROM PlaylistItem pi WHERE pi.id.playlistId = :playlistId")
+    Integer findMaxPositionByPlaylistId(@Param("playlistId") Long playlistId);
 
-    Set<Long> findMusicIdsByIdPlaylistId(Long playlistId);
+    @Query("SELECT p.musicId FROM PlaylistItem p WHERE p.id.playlistId = :playlistId")
+    Set<Long> findMusicIdsByPlaylistId(@Param("playlistId") Long playlistId);
 
-    Set<Integer> findPositionsByIdPlaylistId(Long playlistId);
+    @Query("SELECT p.id.position FROM PlaylistItem p WHERE p.id.playlistId = :playlistId")
+    Set<Integer> findPositionsByPlaylistId(Long playlistId);
 
     Long findMusicIdByIdPlaylistIdAndIdPosition(Long playlistId, Integer position);
 

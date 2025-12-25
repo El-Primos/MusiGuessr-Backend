@@ -11,6 +11,7 @@ import java.util.List;
 public interface MusicRepository extends JpaRepository<Music, Long> {
     boolean existsByName(String name);
 
+
     interface ProfileProjection {
         Long getId();
         String getUrl();
