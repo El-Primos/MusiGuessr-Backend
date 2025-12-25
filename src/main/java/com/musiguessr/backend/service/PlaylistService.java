@@ -222,7 +222,7 @@ public class PlaylistService {
             position = request.getPosition();
         } else {
             // max+1
-            Integer max = playlistItemRepository.findMaxPositionByIdPlaylistId(playlistId);
+            Integer max = playlistItemRepository.findMaxPositionByPlaylistId(playlistId);
             position = max + 1;
         }
 
@@ -251,10 +251,10 @@ public class PlaylistService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some songs not found");
         }
 
-        Set<Long> existingMusicIdsInPlaylist = playlistItemRepository.findMusicIdsByIdPlaylistId(playlistId);
-        Set<Integer> positions = playlistItemRepository.findPositionsByIdPlaylistId(playlistId);
+        Set<Long> existingMusicIdsInPlaylist = playlistItemRepository.findMusicIdsByPlaylistId(playlistId);
+        Set<Integer> positions = playlistItemRepository.findPositionsByPlaylistId(playlistId);
 
-        Integer dbMaxPosition = playlistItemRepository.findMaxPositionByIdPlaylistId(playlistId);
+        Integer dbMaxPosition = playlistItemRepository.findMaxPositionByPlaylistId(playlistId);
         int currentMaxPosition = (dbMaxPosition != null) ? dbMaxPosition : 0;
 
         List<PlaylistItem> itemsToSave = new ArrayList<>();
