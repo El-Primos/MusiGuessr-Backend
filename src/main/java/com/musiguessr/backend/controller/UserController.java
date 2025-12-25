@@ -41,6 +41,14 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "User with id " + id + " deleted successfully"));
     }
 
+    @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponseDTO> updateUserRole(
+            @PathVariable Long id,
+            @Valid @RequestBody com.musiguessr.backend.dto.user.UserRoleUpdateRequestDTO dto) {
+        return ResponseEntity.ok(userService.updateUserRole(id, dto.getRole()));
+    }
+
     @PatchMapping("/me")
     public ResponseEntity<UserResponseDTO> updateCurrentUser(@Valid @RequestBody UserUpdateRequestDTO dto) {
         Long userId = authUtil.getCurrentUserId();

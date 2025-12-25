@@ -6,6 +6,7 @@ import com.musiguessr.backend.dto.GameHistoryDTO;
 import com.musiguessr.backend.dto.TournamentHistoryDTO;
 import com.musiguessr.backend.dto.user.UserUpdateRequestDTO;
 import com.musiguessr.backend.model.User;
+import com.musiguessr.backend.model.UserRole;
 import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,16 @@ public class UserService {
             user.setName(dto.getName());
         }
 
+        User savedUser = userRepository.save(user);
+        return toDto(savedUser);
+    }
+
+    @Transactional
+    public UserResponseDTO updateUserRole(Long userId, UserRole role) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setRole(role);
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
