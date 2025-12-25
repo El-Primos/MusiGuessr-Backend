@@ -5,7 +5,6 @@ import com.musiguessr.backend.model.*;
 import com.musiguessr.backend.repository.*;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import com.musiguessr.backend.security.CustomUserDetails;
@@ -73,7 +72,6 @@ public class GameService {
         history.setGame(game);
         history.setUserId(getUserId());
         history.setScore(0);
-        history.setPlayedAt(OffsetDateTime.now());
         gameHistoryRepository.save(history);
 
         game.setState(GameState.ACTIVE);
