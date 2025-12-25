@@ -31,7 +31,6 @@ public class GameService {
     private final UserRepository userRepository;
 
     private final PlaylistService playlistService;
-    private final GameSessionStore sessionStore;
 
     @Transactional
     public GameResponseDTO createGame() {

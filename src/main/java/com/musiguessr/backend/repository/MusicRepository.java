@@ -22,9 +22,9 @@ public interface MusicRepository extends JpaRepository<Music, Long> {
             m.url
         FROM musiguessr_schema.musics m
         WHERE 
-            (:filterGenres  = false OR m.genre IN (:genres))
+            (:filterGenres  = false OR m.genre_id IN (:genres))
         AND 
-            (:filterArtists = false OR m.artist IN (:artists))
+            (:filterArtists = false OR m.artist_id IN (:artists))
         ORDER BY RANDOM()
         LIMIT :length
         """, nativeQuery = true)
