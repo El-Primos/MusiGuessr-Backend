@@ -55,6 +55,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(userId, dto));
     }
 
+    @PatchMapping("/me/password")
+    public ResponseEntity<String> updatePassword(
+            @Valid @RequestBody com.musiguessr.backend.dto.user.PasswordUpdateRequestDTO dto) {
+        Long userId = authUtil.getCurrentUserId();
+        userService.updatePassword(userId, dto.getCurrentPassword(), dto.getNewPassword());
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
     @PostMapping("/me/profile-picture/presign")
     public ResponseEntity<com.musiguessr.backend.dto.user.ProfilePicturePresignResponseDTO> presignProfilePicture(
             @Valid @RequestBody com.musiguessr.backend.dto.user.ProfilePicturePresignRequestDTO dto) {

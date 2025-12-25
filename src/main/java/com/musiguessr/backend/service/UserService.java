@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,6 +34,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final PasswordEncoder passwordEncoder;
     public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
@@ -63,6 +65,19 @@ public class UserService {
         user.setRole(role);
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 
     public ProfilePicturePresignResponseDTO presignProfilePicture(Long userId, String fileName, String contentType) {
