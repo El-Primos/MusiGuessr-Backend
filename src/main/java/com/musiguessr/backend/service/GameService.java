@@ -69,7 +69,7 @@ public class GameService {
         long totalRounds = playlistItemRepository.countByIdPlaylistId(game.getPlaylistId());
 
         GameHistory history = new GameHistory();
-        history.setGame(game);
+        history.setGameId(game.getId());
         history.setUserId(getUserId());
         history.setScore(0);
         gameHistoryRepository.save(history);
@@ -161,7 +161,7 @@ public class GameService {
         if (game.getOwnerId() != 0) {
             Long userId = getUserId();
 
-            if (userId == 0 || !Objects.equals(userId, game.getOwnerId())) {
+            if (userId != 0 && !Objects.equals(userId, game.getOwnerId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
             }
         }
@@ -182,6 +182,9 @@ public class GameService {
         round.setGameHistoryId(historyId);
         round.setRound(roundNumber);
         round.setSong(songName);
+        round.setGuessedSong("");
+        round.setGuessed(false);
+        round.setGuessTime(0L);
         round.setScoreEarned(0);
         gameRoundRepository.save(round);
     }
@@ -196,18 +199,24 @@ public class GameService {
         GameRound currentRound = gameRoundRepository.findTopByGameHistoryIdOrderByRoundDesc(history.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No active round found"));
 
-        boolean isCorrect = guessedSongName != null && Objects.equals(guessedSongName, currentRound.getSong());
-        int earnedScore = isCorrect ? scoreForElapsed(elapsedMs) : 0;
-        int newTotalScore = history.getScore() + earnedScore;
+       if (!currentRound.getGuessed()) {
+           boolean isCorrect = guessedSongName != null && Objects.equals(guessedSongName, currentRound.getSong());
+           int earnedScore = isCorrect ? scoreForElapsed(elapsedMs) : 0;
+           int newTotalScore = history.getScore() + earnedScore;
 
-        currentRound.setGuessedSong(guessedSongName != null ? guessedSongName : "");
-        currentRound.setScoreEarned(earnedScore);
-        gameRoundRepository.save(currentRound);
+           currentRound.setGuessedSong(guessedSongName != null ? guessedSongName : "");
+           currentRound.setGuessed(true);
+           currentRound.setScoreEarned(earnedScore);
+           currentRound.setGuessTime(elapsedMs);
+           gameRoundRepository.save(currentRound);
 
-        history.setScore(newTotalScore);
-        gameHistoryRepository.save(history);
+           history.setScore(newTotalScore);
+           gameHistoryRepository.save(history);
 
-        return prepareNextRound(game, history, currentRound.getRound(), isCorrect, earnedScore);
+           return prepareNextRound(game, history, currentRound.getRound(), isCorrect, earnedScore);
+       }
+
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already guessed/skipped");
     }
 
     private GameRoundResultDTO prepareNextRound(Game game, GameHistory history, int currentRoundNumber,
@@ -218,7 +227,7 @@ public class GameService {
         roundResultDTO.setEarnedScore(lastEarned);
         roundResultDTO.setTotalScore(history.getScore());
 
-        Long prevMusicId = playlistItemRepository.findMusicIdByIdPlaylistIdAndIdPosition(game.getPlaylistId(),
+        Long prevMusicId = playlistItemRepository.findMusicIdByPlaylistIdAndPosition(game.getPlaylistId(),
                 currentRoundNumber);
         if (prevMusicId != null) {
             roundResultDTO.setCorrectMusicId(prevMusicId);

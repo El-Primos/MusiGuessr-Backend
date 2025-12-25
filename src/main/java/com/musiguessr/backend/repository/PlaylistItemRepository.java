@@ -18,6 +18,8 @@ public interface PlaylistItemRepository extends JpaRepository<PlaylistItem, Play
 
     Optional<PlaylistItem> findByIdPlaylistIdAndMusicId(Long playlistId, Long musicId);
 
+    Long countByIdPlaylistId(Long playlistId);
+
     @Query("SELECT MAX(pi.id.position) FROM PlaylistItem pi WHERE pi.id.playlistId = :playlistId")
     Integer findMaxPositionByPlaylistId(@Param("playlistId") Long playlistId);
 
@@ -27,13 +29,12 @@ public interface PlaylistItemRepository extends JpaRepository<PlaylistItem, Play
     @Query("SELECT p.id.position FROM PlaylistItem p WHERE p.id.playlistId = :playlistId")
     Set<Integer> findPositionsByPlaylistId(Long playlistId);
 
-    Long findMusicIdByIdPlaylistIdAndIdPosition(Long playlistId, Integer position);
-
-    Long countByIdPlaylistId(Long playlistId);
+    @Query("SELECT p.music.id FROM PlaylistItem p WHERE p.id.playlistId = :playlistId AND p.id.position = :position")
+    Long findMusicIdByPlaylistIdAndPosition(@Param("playlistId") Long playlistId, @Param("position") int position);
 
     @Query(value = """
-            SELECT m.* FROM playlist_items pi
-            INNER JOIN musics m ON pi.music_id = m.id
+            SELECT m.* FROM musiguessr_schema.playlist_items pi
+            INNER JOIN musiguessr_schema.musics m ON pi.music_id = m.id
             WHERE pi.playlist_id = :playlistId
             ORDER BY pi.position ASC 
             LIMIT 1 OFFSET :offset
