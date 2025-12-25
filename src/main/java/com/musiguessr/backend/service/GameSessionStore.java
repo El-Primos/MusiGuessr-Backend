@@ -1,6 +1,5 @@
 package com.musiguessr.backend.service;
 
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,21 +23,16 @@ public class GameSessionStore {
         sessions.remove(gameId);
     }
 
-    public boolean isActive(Long gameId) {
-        return sessions.containsKey(gameId);
-    }
-
     @Data
     public static class GameSession {
         private Long gameId;
-        private Long userId;
         private Long playlistId;
 
-        private OffsetDateTime startedAt;
         private int round;
-        private int totalScore;
+        private int totalRounds;
+        private int score;
 
-        private java.util.List<Long> orderedSongIds;
+        private java.util.List<Long> orderedMusicIds;
 
         private RoundState currentRound;
     }
@@ -46,10 +40,8 @@ public class GameSessionStore {
     @Data
     public static class RoundState {
         private int roundNumber;
-        private Long correctSongId;
+        private Long correctMusicId;
         private String previewUrl;
-        private java.util.List<Long> candidateSongIds;
-        private OffsetDateTime deadlineAt;
         private boolean guessed;
     }
 }

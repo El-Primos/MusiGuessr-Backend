@@ -125,6 +125,45 @@ public class PlaylistService {
     }
 
     @Transactional
+    public Long createRandomPlaylist(String name, Integer playlistLength) {
+        List<MusicRepository.ProfileProjection> musics = musicRepository.findRandomMusics(
+                playlistLength,
+                null,
+                false,
+                null,
+                false
+        );
+        if (musics.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No music available");
+        }
+
+        Playlist playlist = new Playlist();
+        playlist.setName(name);
+        playlist.setOwnerId(getOwnerId());
+
+        Playlist savedPlaylist = playlistRepository.save(playlist);
+        Long playlistId = savedPlaylist.getId();
+
+        List<PlaylistItemRequestDTO> items = IntStream.range(0, musics.size())
+                .mapToObj(i -> {
+                    MusicRepository.ProfileProjection music = musics.get(i);
+
+                    PlaylistItemRequestDTO dto = new PlaylistItemRequestDTO();
+                    dto.setSongId(music.getId());
+                    dto.setPosition(i + 1);
+                    return dto;
+                })
+                .toList();
+
+        PlaylistBatchItemRequestDTO batchRequest = new PlaylistBatchItemRequestDTO();
+        batchRequest.setItems(items);
+
+        addSongsToPlaylist(playlistId, batchRequest);
+
+        return playlistId;
+    }
+
+    @Transactional
     public PlaylistResponseDTO updatePlaylist(Long id, PlaylistUpdateRequestDTO request) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Playlist not found"));
