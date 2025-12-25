@@ -65,7 +65,7 @@ public class MusicService {
             ));
         }
 
-        String uniqueKey = "music/" + UUID.randomUUID() + "_" + request.getFileName();
+        String uniqueKey = "music/" + UUID.randomUUID();
         String uploadUrl = s3Service.createPresignedUploadUrl(uniqueKey, request.getContentType());
 
         return new PresignResponseDTO("Presign upload url created", uniqueKey, uploadUrl);
