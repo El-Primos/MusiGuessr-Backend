@@ -24,7 +24,10 @@ public class ArtistService {
     public List<ArtistResponseDTO> getArtists(String name, Integer limit, Integer offset) {
         Stream<Artist> stream = artistRepository.findAll().stream();
 
-        if (name != null) stream = stream.filter(p -> p.getName().toLowerCase().startsWith(name.toLowerCase()));
+        if (name != null) {
+            String needle = name.trim().toLowerCase();
+            stream = stream.filter(p -> p.getName() != null && p.getName().toLowerCase().contains(needle));
+        }
 
         int safeOffset = (offset == null || offset < 0) ? 0 : offset;
         int safeLimit = (limit == null || limit < 0) ? 50 : limit;
