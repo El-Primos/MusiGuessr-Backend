@@ -11,7 +11,7 @@ public class RoundSummaryDTO {
     private boolean response;
     private String songName;
     private String guessedSong;
-    private Integer guessTime;
+    private Long guessTime;
     private Integer scoreEarned;
     private Integer round;
 }

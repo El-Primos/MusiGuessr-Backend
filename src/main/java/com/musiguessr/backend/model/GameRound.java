@@ -30,7 +30,10 @@ public class GameRound {
     private String guessedSong;
 
     @Column(name = "guess_time", nullable = false)
-    private Integer guessTime;
+    private Long guessTime;
+
+    @Column(nullable = false)
+    private Boolean guessed = false;
 
     @Column(name = "score_earned", nullable = false)
     private Integer scoreEarned;
