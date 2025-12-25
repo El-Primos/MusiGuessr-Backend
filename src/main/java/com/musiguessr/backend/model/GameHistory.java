@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,7 +32,4 @@ public class GameHistory {
 
     @Column(name = "score", nullable = false)
     private Integer score = 0;
-
-    @Column(name = "played_at", nullable = false)
-    private OffsetDateTime playedAt;
 }
