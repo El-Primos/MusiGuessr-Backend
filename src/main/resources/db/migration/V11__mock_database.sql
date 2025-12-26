@@ -1,12 +1,12 @@
-﻿INSERT INTO users (id, name, username, email, password, role, score)
+INSERT INTO users (id, name, username, email, password, role, score)
     OVERRIDING SYSTEM VALUE
 VALUES
     (10002, 'Kaan',  'kaan',  'kaan@musiguessr.app',
-     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'USER', 120),
+     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'ADMIN', 120),
     (10003, 'Kemal', 'kemal', 'kemal@musiguessr.app',
-     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'USER', 60),
+     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'ADMIN', 60),
     (10004, 'Alemre','alemre','alemre@musiguessr.app',
-     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'USER', 15)
+     '$2a$10$ZnWZQeQWf8tgzG/DevN8hOXIhMN6YKQLpeUdBpSC30NUHcd9n5qMy', 'ADMIN', 15)
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO followings (user_id, following_id, pending, is_accepted)
@@ -21,7 +21,12 @@ INSERT INTO artists (id, name)
 VALUES
     (20001, 'Neon Skyline'),
     (20002, 'Midnight Lofi'),
-    (20003, 'Anatolian Echo')
+    (20003, 'Anatolian Echo'),
+    (20004, 'Motive'),
+    (20005, 'Mavi Gri'),
+    (20006, 'Son Feci Bisiklet'),
+    (20007, 'Gece'),
+    (20008, 'Mor ve Ötesi')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO genres (id, name)
@@ -30,18 +35,19 @@ VALUES
     (30001, 'Pop'),
     (30002, 'Rock'),
     (30003, 'Lo-fi'),
-    (30004, 'Electronic')
+    (30004, 'Electronic'),
+    (30004, 'Rap')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO musics (id, name, genre_id, artist_id, url, owner_id, created_at)
     OVERRIDING SYSTEM VALUE
 VALUES
-    (40001, 'City Lights',     30004, 20001, 'https://cdn.example.com/audio/city-lights.mp3',     10002, NOW() - INTERVAL '20 days'),
-    (40002, 'Paper Planes',    30001, 20001, 'https://cdn.example.com/audio/paper-planes.mp3',    10002, NOW() - INTERVAL '15 days'),
-    (40003, 'Granite Heart',   30002, 20001, 'https://cdn.example.com/audio/granite-heart.mp3',   10003, NOW() - INTERVAL '12 days'),
-    (40004, 'Night Study',     30003, 20002, 'https://cdn.example.com/audio/night-study.mp3',     10003, NOW() - INTERVAL '10 days'),
-    (40005, 'Rain on Vinyl',   30003, 20002, 'https://cdn.example.com/audio/rain-on-vinyl.mp3',   10004, NOW() - INTERVAL '7 days'),
-    (40006, 'Bosporus Drift',  30004, 20003, 'https://cdn.example.com/audio/bosporus-drift.mp3',  10004, NOW() - INTERVAL '5 days')
+    (40001, 'PVG',     30004, 20004, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/00773ed7-4b98-4f97-946a-e5b9ccda15d2',     10002, NOW() - INTERVAL '20 days'),
+    (40002, 'Aklımı Kaçırdım',    30002, 20005, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/788e8d14-755b-4125-9117-be43cc96aaca',    10002, NOW() - INTERVAL '15 days'),
+    (40003, 'Bu Kız',   30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8cd16756-fdc2-402f-adb2-a8212bf29a76',   10003, NOW() - INTERVAL '12 days'),
+    (40004, 'Ben Öldüm',   30002, 20007, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/68f9864d-b417-4af4-ac90-c5827afbab57',   10004, NOW() - INTERVAL '12 days'),
+    (40005, '80',   30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/842fcab8-90db-4d6a-b888-e77048c45e31',   10004, NOW() - INTERVAL '10 days'),
+    (40006, 'Cambaz',   30002, 20008, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8dd6248c-8707-497d-8cbc-97ea1a7e6eb1',   10004, NOW() - INTERVAL '5 days')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO playlists (id, name, owner_id, created_at)
