@@ -41,12 +41,28 @@ Create a `.env` file in the project root (`/MusiGuessr-Backend/.env`). Docker Co
 
 **`.env` Example:**
 ```properties
+# Database Configuration (Required)
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/musiguessr
 SPRING_DATASOURCE_USERNAME=app_user
 SPRING_DATASOURCE_PASSWORD=app_pass
 
+# Flyway Migration Configuration (Required)
 SPRING_FLYWAY_USER=app_user
 SPRING_FLYWAY_PASSWORD=app_pass
+
+# JWT Authentication (Required)
+# Generate a strong secret key (minimum 256 bits recommended)
+# You can generate one using: openssl rand -base64 32
+JWT_SECRET_KEY=your-secret-key-here-change-this-in-production
+
+# AWS S3 Configuration (Required for file uploads)
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+
+# Optional Configuration (has defaults if not specified)
+# SPRING_APPLICATION_NAME=MusiGuessr Backend
+# JWT_EXPIRATION=3600000           # 1 hour in milliseconds
+# JWT_REFRESH_EXPIRATION=604800000 # 7 days in milliseconds
 ```
 
 ---
@@ -101,6 +117,9 @@ export SPRING_DATASOURCE_USERNAME=app_user
 export SPRING_DATASOURCE_PASSWORD=app_pass
 export SPRING_FLYWAY_USER=app_user
 export SPRING_FLYWAY_PASSWORD=app_pass
+export JWT_SECRET_KEY=your-secret-key-here
+export AWS_ACCESS_KEY_ID=your-aws-access-key-id
+export AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
 
 ./mvnw spring-boot:run
 ```
@@ -112,6 +131,9 @@ $env:SPRING_DATASOURCE_USERNAME="app_user"
 $env:SPRING_DATASOURCE_PASSWORD="app_pass"
 $env:SPRING_FLYWAY_USER="app_user"
 $env:SPRING_FLYWAY_PASSWORD="app_pass"
+$env:JWT_SECRET_KEY="your-secret-key-here"
+$env:AWS_ACCESS_KEY_ID="your-aws-access-key-id"
+$env:AWS_SECRET_ACCESS_KEY="your-aws-secret-access-key"
 
 .\mvnw spring-boot:run
 ```
