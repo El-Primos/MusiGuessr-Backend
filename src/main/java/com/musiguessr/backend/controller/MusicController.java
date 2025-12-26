@@ -41,7 +41,6 @@ public class MusicController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MusicResponseDTO> getMusicById(@PathVariable Long id) {
         return ResponseEntity.ok(musicService.getMusicById(id));
     }
