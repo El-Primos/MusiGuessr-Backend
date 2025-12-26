@@ -1,0 +1,5 @@
+ALTER TABLE game_rounds
+    ALTER COLUMN guess_time TYPE BIGINT;
+
+ALTER TABLE game_rounds
+    ADD COLUMN guessed BOOLEAN NOT NULL DEFAULT FALSE;
