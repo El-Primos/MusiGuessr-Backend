@@ -36,18 +36,18 @@ VALUES
     (30002, 'Rock'),
     (30003, 'Lo-fi'),
     (30004, 'Electronic'),
-    (30004, 'Rap')
+    (30005, 'Rap')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO musics (id, name, genre_id, artist_id, url, owner_id, created_at)
     OVERRIDING SYSTEM VALUE
 VALUES
-    (40001, 'PVG',     30004, 20004, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/00773ed7-4b98-4f97-946a-e5b9ccda15d2',     10002, NOW() - INTERVAL '20 days'),
-    (40002, 'Aklımı Kaçırdım',    30002, 20005, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/788e8d14-755b-4125-9117-be43cc96aaca',    10002, NOW() - INTERVAL '15 days'),
-    (40003, 'Bu Kız',   30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8cd16756-fdc2-402f-adb2-a8212bf29a76',   10003, NOW() - INTERVAL '12 days'),
-    (40004, 'Ben Öldüm',   30002, 20007, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/68f9864d-b417-4af4-ac90-c5827afbab57',   10004, NOW() - INTERVAL '12 days'),
-    (40005, '80',   30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/842fcab8-90db-4d6a-b888-e77048c45e31',   10004, NOW() - INTERVAL '10 days'),
-    (40006, 'Cambaz',   30002, 20008, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8dd6248c-8707-497d-8cbc-97ea1a7e6eb1',   10004, NOW() - INTERVAL '5 days')
+    (40001, 'PVG',              30005, 20004, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/00773ed7-4b98-4f97-946a-e5b9ccda15d2', 10002, NOW() - INTERVAL '20 days'),
+    (40002, 'Aklımı Kaçırdım',  30002, 20005, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/788e8d14-755b-4125-9117-be43cc96aaca', 10002, NOW() - INTERVAL '15 days'),
+    (40003, 'Bu Kız',            30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8cd16756-fdc2-402f-adb2-a8212bf29a76', 10003, NOW() - INTERVAL '12 days'),
+    (40004, 'Ben Öldüm',         30002, 20007, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/68f9864d-b417-4af4-ac90-c5827afbab57', 10004, NOW() - INTERVAL '12 days'),
+    (40005, '80',                30002, 20006, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/842fcab8-90db-4d6a-b888-e77048c45e31', 10004, NOW() - INTERVAL '10 days'),
+    (40006, 'Cambaz',            30002, 20008, 'https://musiguessr-music-bucket.s3.eu-central-1.amazonaws.com/music/8dd6248c-8707-497d-8cbc-97ea1a7e6eb1', 10004, NOW() - INTERVAL '5 days')
     ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO playlists (id, name, owner_id, created_at)
