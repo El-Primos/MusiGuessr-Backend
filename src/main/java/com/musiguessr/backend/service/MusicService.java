@@ -73,16 +73,20 @@ public class MusicService {
 
         String url = s3Service.getUrl(request.getKey());
 
+        // Validate that genre and artist exist
+        if (!genreRepository.existsById(request.getGenreId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found");
+        }
+        if (!artistRepository.existsById(request.getArtistId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Artist not found");
+        }
+
         Music music = new Music();
         music.setOwnerId(authUtil.getCurrentUserId());
         music.setName(request.getName());
         music.setUrl(url);
-
-        music.setGenre(genreRepository.findById(request.getGenreId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Genre not found")));
-
-        music.setArtist(artistRepository.findById(request.getArtistId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Artist not found with ID")));
+        music.setGenreId(request.getGenreId());
+        music.setArtistId(request.getArtistId());
 
         Music savedMusic = musicRepository.save(music);
 
