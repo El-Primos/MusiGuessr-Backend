@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +42,7 @@ class S3ServiceTest {
     @Test
     void createPresignedUploadUrl_ShouldReturnUrl() throws MalformedURLException {
         PresignedPutObjectRequest presignedRequest = mock(PresignedPutObjectRequest.class);
-        when(presignedRequest.url()).thenReturn(new URL("https://presigned-url.com"));
+        when(presignedRequest.url()).thenReturn(URI.create("https://presigned-url.com").toURL());
 
         when(s3Presigner.presignPutObject(any(PutObjectPresignRequest.class)))
                 .thenReturn(presignedRequest);
