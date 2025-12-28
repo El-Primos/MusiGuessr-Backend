@@ -37,3 +37,6 @@ build/
 
 # Environment files
 .env
+
+# Test Results
+results/
