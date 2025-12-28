@@ -12,6 +12,8 @@ import com.musiguessr.backend.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,10 +34,10 @@ public class UserService {
             "webp", "image/webp"
     );
 
+    @Getter
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final PasswordEncoder passwordEncoder;
-    public UserRepository getUserRepository() { return userRepository; }
 
     @Transactional(readOnly = true)
     public UserResponseDTO getUser(Long id) {
